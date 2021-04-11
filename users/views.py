@@ -12,6 +12,7 @@ def create_user(request):
             return render (request, 'reg.html')
         else:
             context = {'form': user_form}
+            return render (request, 'reg.html', context=context)
     else:
         user_form = forms.CreateUserForm()
         context = {'form': user_form}
@@ -33,8 +34,6 @@ def login(request):
             if user:
                 login(user)
                 return HttpResponseRedirect('/')
-            else:
-                pass
         return render (request, 'authForm.html', {'from': user_form})
     else:
         user_form = forms.LogInForm()
