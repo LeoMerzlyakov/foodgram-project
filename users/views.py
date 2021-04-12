@@ -1,8 +1,13 @@
+from django.forms import fields
 from django.http.response import HttpResponse, HttpResponseRedirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
+
 from django.shortcuts import render
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
 from . import forms
 
+User = get_user_model()
 
 def create_user(request):
     if request.method == 'POST':
@@ -18,6 +23,16 @@ def create_user(request):
         context = {'form': user_form}
         return render (request, 'reg.html', context=context)
 
+
+class NewUserView(CreateView):
+    user_form = forms.CreateUserForm
+    success_url = '/'
+    template_name = 'reg.html'
+    fields = ('email','login','password')
+
+    def get_queryset(self):
+        return User.objects.order_by('id')
+        
 
 def login(request):
     if request.method == 'POST':
