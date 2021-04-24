@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,7 +7,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Войти на сайт</title>
-    <link rel="stylesheet" href="./pages/form.css">
+    <link rel="stylesheet" href="{% static '/pages/form.css' %}">
 </head>
 <body class="body">
 <header class="header">
@@ -28,8 +29,21 @@
         <h1 class="main__title">Войти на сайт</h1>
     </div>
     <div class="form-container">
-        <form class="form">
-            <div class="form__group">
+            <form method="POST", action="{% url 'users:login' %}",  class="form">
+                admin@admin.ru
+                
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Войти!"> 
+            </form>
+<!-- 
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Войти2">
+            </form> -->
+            
+            <!-- <div class="form__group">
                 <label for="id_username" class="form__label">Имя</label>
                 <div class="form__field-group">
                     <input type="text" name="username" id="id_username" class="form__input">
@@ -46,8 +60,7 @@
             <div class="form__footer">
                 <button class="button button_style_blue">Войти</button>
                 <a class="form__forgot-link">Забыли пароль?</a>
-            </div>
-        </form>
+            </div> -->
     </div>
 
 

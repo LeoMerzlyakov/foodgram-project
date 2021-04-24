@@ -1,8 +1,25 @@
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.urls import include, path
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from . import views
 
+app_name = 'users'
 urlpatterns = [
-    path('login/', views.login, name='login'),
-    path('create/', views.create_user, name='create_user'),
+    path('login/',
+         LoginView.as_view(template_name='authForm.html',),
+         name='login'),
+         
+    path('logout/', 
+         LogoutView.as_view(
+             template_name='registration/logged_out.html',
+             next_page='recipes:home'
+         ),
+         name='logout'),
+
+    path('change_pass/', PasswordChangeView.as_view(
+        template_name='changePassword.html',
+        success_url = 'recipes:home',
+    ), name='change_password'),
+
     path('new/', views.NewUserView.as_view(), name='new_user'),
 ]
