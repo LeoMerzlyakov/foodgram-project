@@ -10,23 +10,12 @@
     <link rel="stylesheet" href="{% static '/pages/form.css' %}"/>
 </head>
 <body class="body">
-<header class="header">
-    <nav class="nav">
-        <div class="nav__container container">
-            <ul class="nav__items list">
-                <li class="nav__item nav__item_active"><a href="#" class="nav__link link">Рецепты</a></li>
-                <li class="nav__item nav__item_disabled"><a href="#" class="nav__link link">Список покупок <span class="badge badge_style_blue nav__badge" id="counter">4</span></a></li>
-            </ul>
-            <ul class="nav__items list">
-                <li class="nav__item"><a href="{% url 'users:login' %}" class="nav__link link">Войти</a></li>
-                <li class="nav__item"><a href="{% url 'users:new_user' %}" class="button button_style_blue">Создать аккаунт</a></li>
-            </ul>
-        </div>
-    </nav>
-</header>
+
+    {% include "includes/top_block.html" %}
+
     <main class="main container">
         <div class="main__header">
-            <h1 class="main__title">Рецепты</h1>
+            <h1 class="main__title">Рецепты/Неавторизованный</h1>
             <ul class="tags">
                 <li class="tags__item">
                     <a id="breakfast" class="tags__checkbox tags__checkbox_style_orange tags__checkbox_active" href="#"></a>
@@ -155,15 +144,16 @@
             </ul>
         </div>
     </footer>
-<script src="./js/components/MainCards.js"></script>
+<script src="{% static './js/components/MainCards.js' %}"></script>
 
-<script src="./js/components/Purchases.js"></script>
+<script src="{% static './js/components/Purchases.js' %}"></script>
 
-<script src="./js/config/config.js"></script>
-<script src="./js/components/CardList.js"></script>
-<script src="./js/components/Header.js"></script>
+<script src="{% static './js/config/config.js' %}"></script
 
-<script src="./js/api/Api.js"></script>
-<script src="indexNotAuth.js"></script>
+<script src="{% static './js/components/CardList.js' %}"></script
+<script src="{% static './js/components/Header.js' %}"></script
+
+<script src="{% static './js/api/Api.js' %}"></script
+<script src="{% static 'indexNotAuth.js' %}"></script
 </body>
 </html>

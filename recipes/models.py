@@ -16,7 +16,6 @@ class Recipe(models.Model):
         verbose_name='recipe name',
     )
     image = models.ImageField(
-        upload_to='recipes/',
         blank=True,
         null=True,
         verbose_name='recipe photo',
@@ -31,7 +30,7 @@ class Recipe(models.Model):
         through='IngredientsValue'
     )
     tag = models.ManyToManyField(
-        'TAG',
+        'Tag',
         related_name='recipts_by_tag',
         verbose_name='tag for recipe',
     )
@@ -67,6 +66,9 @@ class Tag(models.Model):
         max_length=1,
         choices=TAG,
     )
+
+    def __str__(self):
+        return self.tag
 
 
 class Ingredient(models.Model):

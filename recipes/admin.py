@@ -16,7 +16,7 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ('pk', 'title', 'slug')
     list_filter = ('title', 'slug')
     empty_value_display = '-empty-'
-    inlines = [IngredientsValueInline]
+    inlines = [IngredientsValueInline,]
 
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('pk', 'ingredient', 'unit', )
