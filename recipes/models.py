@@ -1,3 +1,4 @@
+from typing import Callable
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.enums import Choices
@@ -77,3 +78,23 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return f'{self.ingredient}, {self.unit}'
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=CASCADE)
+
+    def __str__(self):
+        return f'{self.user} - {self.recipe}'
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             related_name="user_which_follow",
+                             blank=False,
+                             null=True)
+    author = models.ForeignKey(User,
+                               on_delete=models.CASCADE,
+                               related_name="author_is_followed",
+                               blank=True,
+                               null=True)

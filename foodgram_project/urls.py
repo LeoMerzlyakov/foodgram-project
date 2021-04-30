@@ -15,6 +15,7 @@ Including another URLconf
 """
 from users import urls as userurls
 from recipes import urls as recipesurls
+from api import urls as apiurls
 
 from django.contrib import admin
 from django.urls import include, path
@@ -25,6 +26,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include(userurls,  namespace='users')),
+    path('api/', include(apiurls,  namespace='api')),
     path('', include(recipesurls,  namespace='recipes')),
 ]
 

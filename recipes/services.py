@@ -11,6 +11,9 @@ def get_ingredients(request):
             ingredients[name] = post[f'valueIngredient_{num}']
     return ingredients
 
+def clean_ingredients(recipe_id):
+    IngredientsValue.objects.filter(recipe=recipe_id).delete()
+
 def get_tags(request):
     tags = []
     post = request.POST
@@ -23,7 +26,7 @@ def get_tags(request):
     return tags
 
 
-def seve_recipe(request, form):
+def seve_recipe(request, form, recipe_id=None):
     with transaction.atomic():
         new_recipe = form.save(commit=False)
         new_recipe.author = request.user
@@ -34,7 +37,8 @@ def seve_recipe(request, form):
             new_recipe.tag.add(Tag.objects.get(id=tag_obj.id))
         new_recipe.save()
         
-
+        if recipe_id:
+            clean_ingredients(recipe_id)
         ingredient_list = []
         ingredients = get_ingredients(request)
         for name, quantity in ingredients.items():

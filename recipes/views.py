@@ -56,7 +56,7 @@ def edit_recipes(request, recipe_id):
             files=request.FILES or None
         )
         if form.is_valid():
-            recipe = services.seve_recipe(request, form)
+            recipe = services.seve_recipe(request, form, recipe_id)
             return HttpResponseRedirect(reverse('recipes:recipe', 
                    kwargs={'recipe_id': recipe.id}))
         else:
@@ -64,10 +64,6 @@ def edit_recipes(request, recipe_id):
             return render(request, 'formChangeRecipe.html', context)
     else:
         form = forms.RecipeForm(instance=recipe)
-        for ingr in ingredients:
-            i = ingr.ingredient.ingredient
-            v = ingr.value
-            u = ingr.ingredient.unit
         context = {'form': form, 'recipe': recipe, 'ingredients':ingredients}
         return render(request, 'formChangeRecipe.html', context)
 
