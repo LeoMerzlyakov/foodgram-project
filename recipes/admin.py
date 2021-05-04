@@ -26,9 +26,9 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'tag', )
-    search_fields = ('tag', )
-    list_filter = ('tag',)
+    list_display = ('pk', 'name', )
+    search_fields = ('name', )
+    list_filter = ('name',)
     empty_value_display = '-empty-'
 
 

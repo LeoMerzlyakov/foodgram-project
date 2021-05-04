@@ -30,7 +30,7 @@ class Recipe(models.Model):
         verbose_name='ingredients for recipe',
         through='IngredientsValue'
     )
-    tag = models.ManyToManyField(
+    tags = models.ManyToManyField(
         'Tag',
         related_name='recipts_by_tag',
         verbose_name='tag for recipe',
@@ -63,13 +63,13 @@ class Tag(models.Model):
         ('L', 'lunch'),
         ('D', 'dinner'),
     )
-    tag = models.CharField(
+    name = models.CharField(
         max_length=1,
         choices=TAG,
     )
 
     def __str__(self):
-        return self.tag
+        return self.name
 
 
 class Ingredient(models.Model):
@@ -82,6 +82,9 @@ class Ingredient(models.Model):
 class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=CASCADE)
+
+    class Meta:
+        unique_together = ('recipe', 'user')
 
     def __str__(self):
         return f'{self.user} - {self.recipe}'

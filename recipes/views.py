@@ -64,7 +64,13 @@ def edit_recipes(request, recipe_id):
             return render(request, 'formChangeRecipe.html', context)
     else:
         form = forms.RecipeForm(instance=recipe)
-        context = {'form': form, 'recipe': recipe, 'ingredients':ingredients}
+        tags = recipe.tags.values_list('name', flat=True)
+        context = {
+            'form': form,
+            'recipe': recipe,
+            'ingredients': ingredients,
+            'tags': tags,
+        }
         return render(request, 'formChangeRecipe.html', context)
 
 
@@ -109,6 +115,11 @@ def recipe(request, recipe_id):
     """Страница с отображением конкретного рецепта"""
     recipe = get_object_or_404(models.Recipe, pk=recipe_id)
     ingrs = models.IngredientsValue.objects.filter(recipe=recipe.pk)
-    context = {'recipe': recipe, 'ingredients': ingrs}
+    is_favorite = services.is_favorite(recipe_id, request.user.id)
+    context = {
+        'recipe': recipe,
+        'ingredients': ingrs,
+        'is_favorite': is_favorite,
+    }
     template = loader.get_template('singlePage.html')
     return HttpResponse(template.render(context, request))

@@ -15,31 +15,37 @@
 {% include "includes/top_block.html" %}
 
     <main class="main container">
-        <div class="single-card" data-id="371" data-author="12">
+    {% csrf_token %}
+        <div class="single-card" data-id="{{ recipe.id }}" data-author="{{ recipe.author }}">
             <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="single-card__image">
-            {% csrf_token %}
             <div class="single-card__info">
 
                 <div class="single-card__header-info">
                     <h1 class="single-card__title">{{ recipe.title }}</h1>
                     <div class="single-card__favorite">
-                        <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite icon-favorite_big"></span></button>
+                        {% if is_favorite == False %}
+                            <button class="button button_style_none" name="favorites" data-out ><span class="icon-favorite icon-favorite_big"></span></button>
+                        {% else %}
+                            <button class="button button_style_none" name="favorites"><span class="icon-favorite icon-favorite_active"></span></button>
+                        {% endif %}
                         <div class="single-card__favorite-tooltip tooltip">Добавить в избранное</div>
+                        
                     </div>
                 </div>
 
                 <ul class="single-card__items">
-                    {% for t in recipe.tag.all %}
-                        {% if t.tag == 'L' %}
+                    {% for t in recipe.tags.all %}
+                        {%if t.name == 'L' %}
                             <li class="single-card__item"><span class="badge badge_style_green">Обед</span></li>
                         {% endif %}
-                        {% if t.tag == 'B' %}
+
+                        {%if t.name == 'B' %}
                             <li class="single-card__item"><span class="badge badge_style_orange">Завтрак</span></li>
                         {% endif %}
-                        {% if t.tag == 'D' %}
+
+                        {%if t.name == 'D' %}
                             <li class="single-card__item"><span class="badge badge_style_purple">Ужин</span></li>
                         {% endif %}
-
                     {% endfor %}
                 </ul>
 

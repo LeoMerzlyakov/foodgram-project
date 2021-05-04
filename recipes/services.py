@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from recipes.models import Ingredient, IngredientsValue, Tag
+from recipes.models import Ingredient, IngredientsValue, Recipe, Tag, Favorite
 from django.db import transaction
 
 def get_ingredients(request):
@@ -8,11 +8,22 @@ def get_ingredients(request):
     for key, name in post.items():
         if key.startswith('nameIngredient'):
             num = key.partition('_')[-1]
-            ingredients[name] = post[f'valueIngredient_{num}']
+            int_value = post[f'valueIngredient_{num}'].partition(',')[0]
+            ingredients[name] = int_value
     return ingredients
 
 def clean_ingredients(recipe_id):
     IngredientsValue.objects.filter(recipe=recipe_id).delete()
+
+
+def clear_tags(recipe_id):
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
+    recipe.tags.clear()
+
+
+def is_favorite(recipe, user):
+    return Favorite.objects.filter(user=user, recipe=recipe).exists()
+
 
 def get_tags(request):
     tags = []
@@ -32,9 +43,10 @@ def seve_recipe(request, form, recipe_id=None):
         new_recipe.author = request.user
         new_recipe.save()
         tags = get_tags(request)
+        clear_tags(recipe_id)
         for tag in tags:
-            tag_obj = Tag.objects.filter(tag=tag).first()
-            new_recipe.tag.add(Tag.objects.get(id=tag_obj.id))
+            tag_obj = Tag.objects.filter(name=tag).first()
+            new_recipe.tags.add(Tag.objects.get(id=tag_obj.id))
         new_recipe.save()
         
         if recipe_id:
