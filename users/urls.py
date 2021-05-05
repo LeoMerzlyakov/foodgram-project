@@ -6,7 +6,9 @@ from . import views
 app_name = 'users'
 urlpatterns = [
     path('login/',
-         LoginView.as_view(template_name='authForm.html',),
+         LoginView.as_view(
+             template_name='authForm.html',
+         ),
          name='login'),
          
     path('logout/', 

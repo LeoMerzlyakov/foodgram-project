@@ -101,3 +101,21 @@ class Follow(models.Model):
                                related_name="author_is_followed",
                                blank=True,
                                null=True)
+
+
+class Purchase(models.Model):
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             related_name="purchase_by_user",
+                             blank=False,
+                             null=True)
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.CASCADE,
+                               related_name="purchase_by_recipe",
+                               blank=True,
+                               null=True)
+    class Meta:
+        unique_together = ('recipe', 'user')
+
+    def __str__(self):
+        return f'{self.user} - {self.recipe}'

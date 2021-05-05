@@ -4,21 +4,39 @@ from django.template import context, loader
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.template.defaultfilters import join
 from django.urls import reverse
 from . import models, services, forms
 
 User = get_user_model()
 
 def recipes(request):
-    recipes = models.Recipe.objects.all()
+    if 'tags' in request.GET:
+        selected_tags = request.GET['tags']
+        selected_tags = list(selected_tags)
+        recipes = models.Recipe.objects.filter(
+            tags__name__in=selected_tags
+        ).distinct()
+    else:
+        selected_tags = ['B', 'L', 'D']
+        recipes = models.Recipe.objects.all()
+
     paginator = Paginator(recipes, 6)
     if 'page' in request.GET:
         page_num = request.GET['page']
     else:
         page_num = 1
     page = paginator.get_page(page_num)
-    context = {'recipes': recipes, 'page': page, 'paginator': paginator}
     
+    selected_tags = ''.join(selected_tags)
+
+    context = {
+        'recipes': recipes,
+        'page': page,
+        'paginator': paginator,
+        'tags': selected_tags,
+    }
+
     template = loader.get_template('indexAuth.html')
     return HttpResponse(template.render(context, request))
 

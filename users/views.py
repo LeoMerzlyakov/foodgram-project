@@ -26,7 +26,7 @@ def create_user(request):
 
 class NewUserView(CreateView):
     user_form = forms.CreateUserForm
-    success_url = '/'
+    success_url = reverse_lazy('')
     template_name = 'reg.html'
     fields = ('email','login','password')
 

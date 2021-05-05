@@ -1,5 +1,12 @@
 from django.shortcuts import get_object_or_404
-from recipes.models import Ingredient, IngredientsValue, Recipe, Tag, Favorite
+from recipes.models import (
+    Ingredient,
+    IngredientsValue,
+    Recipe,
+    Tag,
+    Favorite,
+    Purchase,
+)
 from django.db import transaction
 
 def get_ingredients(request):
@@ -23,6 +30,10 @@ def clear_tags(recipe_id):
 
 def is_favorite(recipe, user):
     return Favorite.objects.filter(user=user, recipe=recipe).exists()
+
+
+def is_in_purchase(recipe, user):
+    return Purchase.objects.filter(user=user, recipe=recipe).exists()
 
 
 def get_tags(request):

@@ -1,5 +1,8 @@
 {% load static %}
 {% load thumbnail %}
+{% load recipe_filters %}
+{% load recipe_tags %}
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -11,6 +14,7 @@
     <link rel="stylesheet" href="{% static '/pages/index.css' %}"/>
 </head>
 <body class="body">
+    {% csrf_token %}
 
     {% include "includes/top_block.html" %}
 
@@ -19,24 +23,40 @@
             <h1 class="main__title">Рецепты</h1>
             <ul class="tags">
                 <li class="tags__item">
-                    <a id="breakfast" class="tags__checkbox tags__checkbox_style_orange tags__checkbox_active" href="#"></a>
+                    <a
+                        id="breakfast"
+                        class="tags__checkbox tags__checkbox_style_orange tags__checkbox{% if 'B' in tags %}_active{% endif %}"
+                        href="{% url 'recipes:recipes' %}?tags={{ tags|check_tags:'B' }}">
+                    </a>
                     <span class="tags__label">Завтрак</span>
                 </li>
+
                 <li class="tags__item">
-                    <a id="lunch" class="tags__checkbox tags__checkbox_style_green tags__checkbox_active" href="#"></a>
+                    <a
+                        id="lunch"
+                        class="tags__checkbox tags__checkbox_style_green tags__checkbox{% if 'L' in tags %}_active{% endif %}"
+                        href="{% url 'recipes:recipes' %}?tags={{ tags|check_tags:'L' }}">
+                    </a>
                     <span for="lunch" class="tags__label">Обед</span>
                 </li>
+
                 <li class="tags__item">
-                    <a id="dinner" class="tags__checkbox tags__checkbox_style_purple tags__checkbox_active" href="#"></a>
+                    <a
+                        id="dinner"
+                        class="tags__checkbox tags__checkbox_style_purple tags__checkbox{% if 'D' in tags %}_active{% endif %}"
+                        href="{% url 'recipes:recipes' %}?tags={{ tags|check_tags:'D' }}">
+                    </a>
                     <label for="dinner" class="tags__label">Ужин</label>
                 </li>
+
             </ul>
         </div>
 
         <div class="card-list">
+        
             {% for recipe in page %}
-
                 <div class="card" data-id="{{ recipe.id }}">
+                    <h1>{{ recipe.id }}</h1>
                     {% thumbnail recipe.image "240x240" crop="smart" upscale=True  as image %}
                         <a href="{% url 'recipes:recipe' recipe_id=recipe.id %}" class="link" target="_blank"><img src="{{ image.url }}" alt="{{ recipe.title }}" class="card__image"></a>
                     <div class="card__body">
@@ -63,7 +83,13 @@
                         </div>
                     </div>
                     <div class="card__footer">
-                        <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
+                        {% is_in_purchase request.user.id recipe.id as in_purchase %} 
+                        {% if in_purchase %}
+                            <button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span> Рецепт добавлен</button>
+                        {% else %}
+                            <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
+                        {% endif %}                        
+
                         {% if user.is_autificated %}
                             <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite"></span></button>
                         {% endif %}
@@ -79,19 +105,19 @@
                 <ul class="pagination__container">
 
                     {% if page.has_previous %}
-                            <li class="pagination__item"><a class="pagination__link link" href="?page={{ page.previous_page_number }}"><span class="icon-left"></span></a></li>
+                            <li class="pagination__item"><a class="pagination__link link" href="?page={{ page.previous_page_number }}&tags={{tags}}"><span class="icon-left"></span></a></li>
                     {% endif %}
 
                     {% for i in paginator.page_range %}
                         {% if page.number == i %}
-                            <li class="pagination__item pagination__item_active"><a class="pagination__link link" href="?page={{ i }}">{{ i }}</a></li>
+                            <li class="pagination__item pagination__item_active"><a class="pagination__link link" href="?page={{ i }}&tags={{tags}}">{{ i }}</a></li>
                         {% else %}
-                            <li class="pagination__item"><a class="pagination__link link" href="?page={{ i }}">{{ i }}</a></li>
+                            <li class="pagination__item"><a class="pagination__link link" href="?page={{ i }}&tags={{tags}}">{{ i }}</a></li>
                         {% endif %}
                     {% endfor %}
             
                     {% if page.has_next %}
-                        <li class="pagination__item"><a class="pagination__link link" href="?page={{ page.next_page_number }}"><span class="icon-right"></span></a></li>
+                        <li class="pagination__item"><a class="pagination__link link" href="?page={{ page.next_page_number }}&tags={{tags}}"><span class="icon-right"></span></a></li>
                     {% endif %}
 
                 </ul>
