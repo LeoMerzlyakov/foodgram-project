@@ -10,100 +10,59 @@
     <link rel="stylesheet" href="{% static '/pages/form.css' %}"/>
 </head>
 <body class="body">
-<header class="header">
-    <nav class="nav">
-        <div class="nav__container container">
-            <ul class="nav__items list">
-                <li class="nav__item nav__item_disabled"><a href="#" class="nav__link link">Рецепты</a></li>
-                <li class="nav__item nav__item_disabled"><a href="#" class="nav__link link">Список покупок</a></li>
-            </ul>
-            <ul class="nav__items list">
-                <li class="nav__item"><a href="#" class="nav__link link">Войти</a></li>
-                <li class="nav__item"><a href="#" class="button button_style_blue">Создать аккаунт</a></li>
+
+    {% include "includes/top_block.html" %}
+
+    <main class="main container">
+        <div class="main__header">
+            <h1 class="main__title">Регистрация</h1>
+        </div>
+        <div class="form-container">
+            <form class="form" method="POST">
+                {% csrf_token %}
+
+                {% for non_field_error in form.non_field_errors %}
+                    <p class="form__label">{{ non_field_error }}</p>
+                {% endfor %}
+                
+                {% for field in form %}
+                    <div class="form__group">
+                        <label for="{{ field.id_for_label }}" class="form__label">{{ field.html_name }}</label>
+                        <div class="form__field-group">
+                            
+                            <input
+                                type="{{field.type}}"
+                                name="{{ field.html_name }}"
+                                id="{{ field.id_for_label }}"
+                                class="form__input"
+                            >
+
+                            <span class="form__error">
+                                {% for error in field.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </span>
+
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="form__footer">
+                    <input class="button button_style_blue" type="submit" value="Создать аккаунт">
+                </div>
+            </form>
+        </div>
+
+
+    </main>
+    <footer class="footer">
+        <div class="footer__container container">
+            <a href="#" class="footer__brand link">Продуктовый помощник</a>
+            <ul class="footer__items">
+                <li class="footer__item"><a href="#" class="footer__link link">Об авторе </a></li>
+                <li class="footer__item"><a href="#" class="footer__link link">Технологии</a></li>
             </ul>
         </div>
-    </nav>
-</header>
-<main class="main container">
-    <div class="main__header">
-        <h1 class="main__title">Регистрация</h1>
-    </div>
-
-    <div class="form-container">
-        <form class="form" method="POST">
-            {% csrf_token %}
-
-            {% for non_field_error in form.non_field_errors %}
-                <p class="form__label">{{ non_field_error }}</p>
-            {% endfor %}
-            
-            {% for field in form %}
-                <div class="form__group">
-                    <label for="{{ field.id_for_label }}" class="form__label">{{ field.html_name }}</label>
-                    <div class="form__field-group">
-
-                        <!-- <input type="{{field.type}}" name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="form__input"> -->
-                                <p>{{ field }}</p>
-
-                        <!-- <div class="form__input">{{field}}</div> -->
-                        <!-- {{ field }} -->
-
-                        <span class="form__error">
-                            {% for error in field.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </span>
-
-                    </div>
-                </div>
-            {% endfor %}
-            
-            <!-- <form method="POST">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <input type="submit" class="button button_style_blue" value="Создать аккаунт">
-            </form> -->
-
-            <!-- <div class="form__group">
-                <label for="id_first_name" class="form__label">email</label>
-                <div class="form__field-group">
-                    <input type="text" name="first_name" id="id_first_name" class="form__input">
-                    <span class="form__error"></span>
-                </div>
-            </div>
-
-            <div class="form__group">
-                <label for="id_username" class="form__label">Имя пользователя</label>
-                <div class="form__field-group">
-                    <input type="text" name="username" id="id_username" class="form__input">
-                    <span class="form__error">Имя пользователя и пароль не совпадают. Введите правильные данные.
-                    </span>
-                </div>
-            </div>
-
-            <div class="form__group">
-                <label for="id_password" class="form__label">Пароль</label>
-                <div class="form__field-group">
-                    <input type="password" name="password" id="id_password" class="form__input">
-                    <span class="form__error"></span>
-                </div>
-            </div> -->
-
-            <input type="submit" class="button button_style_blue" value="Создать аккаунт">
-
-        </form>
-    </div>
-
-
-</main>
-<footer class="footer">
-    <div class="footer__container container">
-        <a href="#" class="footer__brand link">Продуктовый помощник</a>
-        <ul class="footer__items">
-            <li class="footer__item"><a href="#" class="footer__link link">Об авторе </a></li>
-            <li class="footer__item"><a href="#" class="footer__link link">Технологии</a></li>
-        </ul>
-    </div>
-</footer>
+    </footer>
 </body>
 </html>

@@ -101,6 +101,9 @@ class Follow(models.Model):
                                related_name="author_is_followed",
                                blank=True,
                                null=True)
+    class Meta:
+        unique_together = ('author', 'user')
+
 
 
 class Purchase(models.Model):

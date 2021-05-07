@@ -10,11 +10,11 @@ class UserCreationForm(forms.ModelForm):
     """A form for creating new users."""
     email = forms.CharField(label='Email', widget=forms.EmailInput)
     password = forms.CharField(label='Password', widget=forms.PasswordInput)
-    login = forms.CharField(label='Login', widget=forms.TextInput)
+    username = forms.CharField(label='username', widget=forms.TextInput)
 
     class Meta:
         model = User
-        fields = ('email', 'login', 'password')
+        fields = ('username', 'password', 'email')
 
 
 class UserChangeForm(forms.ModelForm):
@@ -23,7 +23,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'login', 'is_active', 'is_admin')
+        fields = ('email', 'password', 'username', 'is_active', 'is_admin')
 
 
 class UserAdmin(BaseUserAdmin):
@@ -31,22 +31,22 @@ class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
 
-    list_display = ('email', 'login', 'is_admin')
+    list_display = ('username', 'is_admin', 'email')
     list_filter = ('is_admin',)
     fieldsets = (
         (None, {'fields': ('email', )}),
-        ('Personal info', {'fields': ('login',)}),
+        ('Personal info', {'fields': ('username',)}),
         ('Permissions', {'fields': ('is_admin',)}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'login', 'password', 'is_admin'),
+            'fields': ('email', 'username', 'password', 'is_admin'),
         }),
     )
 
-    search_fields = ('email', 'login')
+    search_fields = ('email', 'username')
     ordering = ('email',)
     filter_horizontal = ()
 

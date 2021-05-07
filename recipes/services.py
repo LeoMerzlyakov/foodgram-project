@@ -24,8 +24,9 @@ def clean_ingredients(recipe_id):
 
 
 def clear_tags(recipe_id):
-    recipe = get_object_or_404(Recipe, pk=recipe_id)
-    recipe.tags.clear()
+    if recipe_id:
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        recipe.tags.clear()
 
 
 def is_favorite(recipe, user):

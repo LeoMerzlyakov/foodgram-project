@@ -1,5 +1,5 @@
 from django.core.checks import messages
-from recipes.models import Favorite, Purchase
+from recipes.models import Favorite, Purchase, Follow
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -7,7 +7,11 @@ from users.models import User
 from django.shortcuts import get_object_or_404
 from django.db import InternalError
 
-from .serializers import FavoriteSerializer, PurchseSerializer
+from .serializers import (
+    FavoriteSerializer,
+    PurchseSerializer,
+    SubscriptionSerializer,
+)
 from .service import get_ingredients, get_favor_note
 
 
@@ -64,6 +68,38 @@ class PurchasesViewSet(viewsets.ViewSet):
     def destroy(self, request, pk=None):
         user = request.user
         instance = get_object_or_404(Purchase, recipe=pk, user=user)
+        try:
+            instance.delete()
+        except InternalError:
+            error_msg = {'error': 'InternalError message'}
+            raise InternalError(error_msg)
+        return Response(status=status.HTTP_204_NO_CONTENT, data={"success": True})
+
+class SubscriptionViewSet(viewsets.ViewSet):
+    """
+    A ViewSet for create or delete Subscription.
+    """
+    def create(self, request):
+        author_name = request.data['id']
+        author = get_object_or_404(User, username=author_name)
+        data = {}
+        data['author'] = author.pk
+        serializer = SubscriptionSerializer(data=data)
+        serializer.is_valid()
+        try:
+            serializer.save(user=request.user)
+        except:
+            return Response(
+                status=status.HTTP_409_CONFLICT,
+                data={"success": False}
+            )
+        return Response(serializer.data)
+
+
+    def destroy(self, request, pk=None):
+        user = request.user
+        author = get_object_or_404(User, username=pk)
+        instance = get_object_or_404(Follow, author=author, user=user)
         try:
             instance.delete()
         except InternalError:

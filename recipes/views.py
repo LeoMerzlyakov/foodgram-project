@@ -35,6 +35,7 @@ def recipes(request):
         'page': page,
         'paginator': paginator,
         'tags': selected_tags,
+        'selected_page': 'recipes'
     }
 
     template = loader.get_template('indexAuth.html')
@@ -57,7 +58,12 @@ def favorites(request):
     else:
         page_num = 1
     page = paginator.get_page(page_num)
-    context = {'recipes': recipes, 'page': page, 'paginator': paginator}
+    context = {
+        'recipes': recipes,
+        'page': page,
+        'paginator': paginator,
+        'selected_page': 'favorites'
+    }
     template = loader.get_template('favorite.html')
     return HttpResponse(template.render(context, request))
 
@@ -102,11 +108,17 @@ def create_recipe(request):
             return HttpResponseRedirect(reverse('recipes:recipe', 
                    kwargs={'recipe_id': recipe.id}))
         else:
-            context = {'form': form}
+            context = {
+                'form': form,
+                'selected_page': 'new_recipe'
+            }
             return render(request, 'formRecipe.html', context)
     else:
         form = forms.RecipeForm()
-        context = {'form': form}
+        context = {
+                'form': form,
+                'selected_page': 'new_recipe'
+            }
         return render(request, 'formRecipe.html', context)
 
 
@@ -114,8 +126,11 @@ def create_recipe(request):
 def follows(request):
     """Страница с отображением подписок"""
     recipe = models.Recipe.objects.all()
-    context = {'recipes': recipe}
-    template = loader.get_template('favorite.html')
+    context = {
+        'recipes': recipe,
+        'selected_page': 'follows'
+    }
+    template = loader.get_template('myFollow.html')
     return HttpResponse(template.render(context, request))
 
 
@@ -123,8 +138,11 @@ def follows(request):
 def purchases(request):
     """Страница с отображением покупок"""
     recipe = models.Recipe.objects.all()
-    context = {'recipes': recipe}
-    template = loader.get_template('favorite.html')
+    context = {
+        'recipes': recipe,
+        'selected_page': 'purchases'
+    }
+    template = loader.get_template('shopList.html')
     return HttpResponse(template.render(context, request))
 
 

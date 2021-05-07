@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password, login):
+    def create_user(self, email, password, username):
         """
         Creates and saves a User with the given email and password.
         """
@@ -13,21 +13,21 @@ class UserManager(BaseUserManager):
             raise ValueError('Users must have an email address')
 
         user = self.model(
+            username=username,
             email=self.normalize_email(email),
         )
-
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password, login):
+    def create_superuser(self, email, password, username):
         """
         Creates and saves a superuser with the given email, password.
         """
         user = self.create_user(
             email,
             password=password,
-            login=login,
+            username=username,
         )
         user.is_admin = True
         user.save(using=self._db)
@@ -36,13 +36,13 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     email = models.EmailField(
-        verbose_name='email address',
+        verbose_name='email',
         max_length=255,
         unique=True,
     )
-    login =  models.CharField(
+    username =  models.CharField(
         max_length=256,
-        verbose_name='user login',
+        verbose_name='username',
         unique=True,
     )
     is_active = models.BooleanField(default=True)
@@ -50,11 +50,11 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['login', 'password']
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['password', 'email']
 
     def __str__(self):
-        return self.login
+        return self.username
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"

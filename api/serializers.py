@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from recipes.models import Favorite, Purchase, Recipe
+from recipes.models import Favorite, Purchase, Recipe, Follow
+from rest_framework.validators import UniqueTogetherValidator
 from django.db import IntegrityError
 
 
@@ -33,3 +34,27 @@ class PurchseSerializer(serializers.ModelSerializer):
         except IntegrityError:
             error_msg = {'error': 'IntegrityError message'}
             raise serializers.ValidationError(error_msg)
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    """Serializer for Follow model"""
+
+    class Meta:
+        model = Follow
+        fields = '__all__'
+        read_only_fields = ['user']
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=['user', 'author']
+            )
+        ]
+
+    def validate(self, data):
+        """
+        Check that the start is before the stop.
+        """
+        if data['start_date'] > data['end_date']:
+            raise serializers.ValidationError("finish must occur after start")
+        return data

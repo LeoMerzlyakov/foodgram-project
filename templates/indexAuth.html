@@ -16,7 +16,7 @@
 <body class="body">
     {% csrf_token %}
 
-    {% include "includes/top_block.html" %}
+    {% include "includes/top_block.html" with page=selected_page%}
 
     <main class="main container">
         <div class="main__header">

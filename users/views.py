@@ -1,36 +1,64 @@
-from django.forms import fields
+from django.contrib.messages.api import error
 from django.http.response import HttpResponse, HttpResponseRedirect
-from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.template import context, loader
-from django.shortcuts import render, redirect
-from django.views.generic import CreateView
-from django.urls import reverse_lazy
+from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect, render
+from django.contrib import messages
+from django.contrib.auth import get_user_model, views
+
 from . import forms
+
 
 User = get_user_model()
 
-def create_user(request):
+def register_user(request):
     if request.method == 'POST':
-        user_form = forms.CreateUserForm()
-        if user_form.is_valid():
-            user_form.save()
-            return render (request, 'reg.html')
-        else:
-            context = {'form': user_form}
-            return render (request, 'reg.html', context=context)
+        form = forms.CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            messages.success(
+                request,
+                message=f'Аккаунт {username} успено создан'
+            )
+            return redirect('users:login')
     else:
-        user_form = forms.CreateUserForm()
-        context = {'form': user_form}
-        return render (request, 'reg.html', context=context)
+        form = forms.CreateUserForm()
+    return render(request, 'reg.html', {'form': form})
 
 
-class NewUserView(CreateView):
-    user_form = forms.CreateUserForm
-    success_url = reverse_lazy('')
-    template_name = 'reg.html'
-    fields = ('email','login','password')
-
-    def get_queryset(self):
-        return User.objects.order_by('id')
-
-
+# def loginview(request):
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         # email = request.POST['email']
+#         user = authenticate(
+#             request=request,
+#             username=username,
+#             password=password,
+#             # email=email,
+#         )
+#         if user is not None:
+#             if user.is_active:
+#                 login(request, user)
+#                 messages.success(
+#                     request,
+#                     message=f'Пользователь {username} успешно вошёл!'
+#                 )
+#                 return redirect('/')
+#             else:
+#                 messages.warning(
+#                     request,
+#                     message=f'Пользователь {username} не активен!'
+#                 )
+#                 return redirect('/')
+#         else:
+#             messages.warning(
+#                 request,
+#                 message='Неверные данные'
+#             )
+#             return render(request, 'authForm.html', {})
+#         # else:
+#         #     return render(request, 'authForm.html', {'form': form})
+#     else:
+#         form = forms.LogInForm()
+#         return render(request, 'authForm.html', {'form': form})
