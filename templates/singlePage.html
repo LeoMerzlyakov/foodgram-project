@@ -70,7 +70,12 @@
                     {% endif %}  
                 
                     <li class="single-card__item">
-                        <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button>
+                    {% is_subscubed request.user.id recipe.author.id as subs_true %} 
+                    {% if subs_true %}
+                        <button class="button button_style_light-blue-outline button_size_subscribe" name="subscribe">Отписаться от автора</button>
+                    {% else %}
+                        <button class="button button_style_light-blue-outline button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button>
+                    {% endif %}
                     </li>
                 </ul>
 

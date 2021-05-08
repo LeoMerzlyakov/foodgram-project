@@ -82,19 +82,15 @@ class SubscriptionViewSet(viewsets.ViewSet):
     def create(self, request):
         author_name = request.data['id']
         author = get_object_or_404(User, username=author_name)
-        data = {}
-        data['author'] = author.pk
+        data = {
+            'author': author.pk,
+            'user': request.user.pk,
+        }
         serializer = SubscriptionSerializer(data=data)
-        serializer.is_valid()
-        try:
-            serializer.save(user=request.user)
-        except:
-            return Response(
-                status=status.HTTP_409_CONFLICT,
-                data={"success": False}
-            )
-        return Response(serializer.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user, author=author)
 
+        return Response(serializer.data)
 
     def destroy(self, request, pk=None):
         user = request.user

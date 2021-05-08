@@ -1,5 +1,5 @@
 from django import template
-from recipes.models import Purchase
+from recipes.models import Follow, Purchase
 
 
 register = template.Library()
@@ -12,3 +12,8 @@ def is_in_purchase(user, recipe):
 @register.simple_tag()
 def purchase_count(user):
     return Purchase.objects.filter(user=user).count()
+
+@register.simple_tag()
+def is_subscubed(user, author):
+    subs = Follow.objects.filter(user=user, author=author).exists()
+    return subs

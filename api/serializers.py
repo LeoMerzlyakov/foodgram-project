@@ -2,6 +2,8 @@ from rest_framework import serializers
 from recipes.models import Favorite, Purchase, Recipe, Follow
 from rest_framework.validators import UniqueTogetherValidator
 from django.db import IntegrityError
+from django.shortcuts import get_object_or_404
+from users.models import User
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -42,19 +44,12 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = '__all__'
-        read_only_fields = ['user']
 
         validators = [
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
-                fields=['user', 'author']
+                fields=['user', 'author'],
+                message='Подписка уже оформлена' 
             )
         ]
 
-    def validate(self, data):
-        """
-        Check that the start is before the stop.
-        """
-        if data['start_date'] > data['end_date']:
-            raise serializers.ValidationError("finish must occur after start")
-        return data
