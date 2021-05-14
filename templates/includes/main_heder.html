@@ -1,0 +1,43 @@
+{% load recipe_filters %}
+{% load recipe_tags %}
+
+<div class="main__header">
+    <h1 class="main__title">{% get_main_header_name selected_page page.object_list.first.author.id %}</h1>
+    
+    <ul class="tags">
+        {% get_url_page selected_page as page_url %}
+
+        {% if selected_page == 'author' %}
+            {% url page_url page.object_list.first.author.id as this_url %}
+        {% else %}
+            {% url page_url as this_url %}
+        {% endif %} 
+
+        <li class="tags__item">
+            <a
+                id="breakfast"
+                class="tags__checkbox tags__checkbox_style_orange tags__checkbox{% if 'B' in tags %}_active{% endif %}"
+                href=" {{ this_url }}?tags={{ tags|check_tags:'B' }}">
+            </a>
+            <span class="tags__label">Завтрак</span>
+        </li>
+
+        <li class="tags__item">
+            <a
+                id="lunch"
+                class="tags__checkbox tags__checkbox_style_green tags__checkbox{% if 'L' in tags %}_active{% endif %}"
+                href="{{ this_url }}?tags={{ tags|check_tags:'L' }}">
+            </a>
+            <span for="lunch" class="tags__label">Обед</span>
+        </li>
+
+        <li class="tags__item">
+            <a
+                id="dinner"
+                class="tags__checkbox tags__checkbox_style_purple tags__checkbox{% if 'D' in tags %}_active{% endif %}"
+                href="{{ this_url }}?tags={{ tags|check_tags:'D' }}">
+            </a>
+            <label for="dinner" class="tags__label">Ужин</label>
+        </li>
+    </ul>
+</div>

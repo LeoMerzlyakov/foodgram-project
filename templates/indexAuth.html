@@ -16,89 +16,12 @@
 <body class="body">
     {% csrf_token %}
 
-    {% include "includes/top_block.html" with page=selected_page%}
+    {% include "includes/top_block.html" with page=selected_page %}
 
     <main class="main container">
-        <div class="main__header">
-            <h1 class="main__title">Рецепты</h1>
-            <ul class="tags">
-                <li class="tags__item">
-                    <a
-                        id="breakfast"
-                        class="tags__checkbox tags__checkbox_style_orange tags__checkbox{% if 'B' in tags %}_active{% endif %}"
-                        href="{% url 'recipes:recipes' %}?tags={{ tags|check_tags:'B' }}">
-                    </a>
-                    <span class="tags__label">Завтрак</span>
-                </li>
-
-                <li class="tags__item">
-                    <a
-                        id="lunch"
-                        class="tags__checkbox tags__checkbox_style_green tags__checkbox{% if 'L' in tags %}_active{% endif %}"
-                        href="{% url 'recipes:recipes' %}?tags={{ tags|check_tags:'L' }}">
-                    </a>
-                    <span for="lunch" class="tags__label">Обед</span>
-                </li>
-
-                <li class="tags__item">
-                    <a
-                        id="dinner"
-                        class="tags__checkbox tags__checkbox_style_purple tags__checkbox{% if 'D' in tags %}_active{% endif %}"
-                        href="{% url 'recipes:recipes' %}?tags={{ tags|check_tags:'D' }}">
-                    </a>
-                    <label for="dinner" class="tags__label">Ужин</label>
-                </li>
-
-            </ul>
-        </div>
-
-        <div class="card-list">
-        
-            {% for recipe in page %}
-                <div class="card" data-id="{{ recipe.id }}">
-                    <h1>{{ recipe.id }}</h1>
-                    {% thumbnail recipe.image "240x240" crop="smart" upscale=True  as image %}
-                        <a href="{% url 'recipes:recipe' recipe_id=recipe.id %}" class="link" target="_blank"><img src="{{ image.url }}" alt="{{ recipe.title }}" class="card__image"></a>
-                    <div class="card__body">
-                        <a class="card__title link" href="{% url 'recipes:recipe' recipe_id=recipe.id %}" target="_blank">{{ recipe.title }}</a>
-                        
-                        <ul class="card__items">
-                        {% for t in recipe.tag.all %}
-                            {% if t.tag == 'L' %}
-                                <li class="card__item"><span class="badge badge_style_green">Обед</span></li>
-                            {% endif %}
-                            {% if t.tag == 'B' %}
-                                <li class="card__item"><span class="badge badge_style_orange">Завтрак</span></li>
-                            {% endif %}
-                            {% if t.tag == 'D' %}
-                                <li class="card__item"><span class="badge badge_style_purple">Ужин</span></li>
-                            {% endif %}
- 
-                        {% endfor %}
-                        </ul>
-                        
-                        <div class="card__items card__items_column">
-                            <p class="card__text"><span class="icon-time"></span>{{ recipe.cooking_time }}, мин.</p>
-                            <p class="card__text"><span class="icon-user"></span> <a href="{% url 'recipes:recipes_by_author' user_id=recipe.author.id %}" style="color: black">{{recipe.author}}</a></p>
-                        </div>
-                    </div>
-                    <div class="card__footer">
-                        {% is_in_purchase request.user.id recipe.id as in_purchase %} 
-                        {% if in_purchase %}
-                            <button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span> Рецепт добавлен</button>
-                        {% else %}
-                            <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
-                        {% endif %}                        
-
-                        {% if user.is_autificated %}
-                            <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite"></span></button>
-                        {% endif %}
-                    </div>
-                </div>
-
-            {% endfor %}
-           
-        </div>
+    
+        {% include "includes/main_heder.html" %}
+        {% include "includes/card_list.html" %}
 
         {% if page.has_other_pages %}
             <nav class="pagination" aria-label="Search results pages">
@@ -130,11 +53,13 @@
         <div class="footer__container container">
             <a href="#" class="footer__brand link">Продуктовый помощник</a>
             <ul class="footer__items">
-                <li class="footer__item"><a href="#" class="footer__link link">Об авторе </a></li>
-                <li class="footer__item"><a href="#" class="footer__link link">Технологии</a></li>
+                <li class="footer__item"><a href="/about/" class="footer__link link">Об авторе </a></li>
+                <li class="footer__item"><a href="/tech/" class="footer__link link">Технологии</a></li>
             </ul>
         </div>
     </footer>
+
+
   <script src="{% static '/js/components/MainCards.js' %}"></script>
   
   <script src="{% static '/js/components/Purchases.js' %}"></script>

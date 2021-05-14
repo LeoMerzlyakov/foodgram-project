@@ -36,13 +36,13 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     email = models.EmailField(
-        verbose_name='email',
+        verbose_name='Почта (email)',
         max_length=255,
         unique=True,
     )
     username =  models.CharField(
         max_length=256,
-        verbose_name='username',
+        verbose_name='Имя пользователя',
         unique=True,
     )
     is_active = models.BooleanField(default=True)

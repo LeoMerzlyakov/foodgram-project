@@ -9,7 +9,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.SET('deleted'),
-        related_name='recipts_by_author',
+        related_name='recipes_by_author',
         verbose_name='recipe author',
     )
     title = models.CharField(
@@ -26,13 +26,13 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         'Ingredient',
-        related_name='recipts_by_ingredients',
+        related_name='recipes_by_ingredients',
         verbose_name='ingredients for recipe',
         through='IngredientsValue'
     )
     tags = models.ManyToManyField(
         'Tag',
-        related_name='recipts_by_tag',
+        related_name='recipes_by_tag',
         verbose_name='tag for recipe',
     )
     slug = models.SlugField()
@@ -80,8 +80,15 @@ class Ingredient(models.Model):
         return f'{self.ingredient}, {self.unit}'
 
 class Favorite(models.Model):
-    user = models.ForeignKey(User, on_delete=CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=CASCADE)
+    user = models.ForeignKey(
+        User,
+        on_delete=CASCADE,
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=CASCADE,
+        related_name="favorites_recipes",
+    )
 
     class Meta:
         unique_together = ('recipe', 'user')
@@ -114,7 +121,7 @@ class Purchase(models.Model):
                              null=True)
     recipe = models.ForeignKey(Recipe,
                                on_delete=models.CASCADE,
-                               related_name="purchase_by_recipe",
+                               related_name="recipes_by_purchases",
                                blank=True,
                                null=True)
     class Meta:

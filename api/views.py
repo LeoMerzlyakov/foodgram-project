@@ -80,8 +80,11 @@ class SubscriptionViewSet(viewsets.ViewSet):
     A ViewSet for create or delete Subscription.
     """
     def create(self, request):
-        author_name = request.data['id']
-        author = get_object_or_404(User, username=author_name)
+        try:
+            author = get_object_or_404(User, pk=int(request.data['id']))
+        except:
+            author = get_object_or_404(User, username=request.data['id'])
+
         data = {
             'author': author.pk,
             'user': request.user.pk,
@@ -94,7 +97,10 @@ class SubscriptionViewSet(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         user = request.user
-        author = get_object_or_404(User, username=pk)
+        try:
+            author = get_object_or_404(User, pk=int(pk))
+        except:
+            author = get_object_or_404(User, username=pk)        
         instance = get_object_or_404(Follow, author=author, user=user)
         try:
             instance.delete()

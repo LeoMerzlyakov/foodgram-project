@@ -22,12 +22,18 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
+from django.conf.urls import (
+handler400, handler403, handler404, handler500
+)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include(userurls,  namespace='users')),
     path('api/', include(apiurls,  namespace='api')),
+    path('pages/', include('django.contrib.flatpages.urls')),
     path('', include(recipesurls,  namespace='recipes')),
 ]
+
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

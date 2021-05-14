@@ -1,4 +1,5 @@
-from django.shortcuts import get_object_or_404, render
+from django.http import FileResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.template import context, loader
 from django.contrib.auth import get_user_model
@@ -20,6 +21,7 @@ def recipes(request):
     else:
         selected_tags = ['B', 'L', 'D']
         recipes = models.Recipe.objects.all()
+    selected_tags = ''.join(selected_tags)
 
     paginator = Paginator(recipes, 6)
     if 'page' in request.GET:
@@ -28,8 +30,6 @@ def recipes(request):
         page_num = 1
     page = paginator.get_page(page_num)
     
-    selected_tags = ''.join(selected_tags)
-
     context = {
         'recipes': recipes,
         'page': page,
@@ -44,14 +44,56 @@ def recipes(request):
 
 def user_recipes(request, user_id):
     recipes = models.Recipe.objects.filter(author=user_id)
-    context = {'recipes': recipes}
+
+    if 'tags' in request.GET:
+        selected_tags = request.GET['tags']
+        selected_tags = list(selected_tags)
+        recipes = models.Recipe.objects.filter(
+            author=user_id,
+            tags__name__in=selected_tags
+        ).distinct()
+    else:
+        selected_tags = ['B', 'L', 'D']
+        recipes = models.Recipe.objects.filter(author=user_id)
+    selected_tags = ''.join(selected_tags)
+
+    paginator = Paginator(recipes, 6)
+    if 'page' in request.GET:
+        page_num = request.GET['page']
+    else:
+        page_num = 1
+    page = paginator.get_page(page_num)
+    
+    selected_tags = ''.join(selected_tags)
+    
+    context = {
+        'recipes': recipes,
+        'page': page,
+        'paginator': paginator,
+        'tags': selected_tags,
+        'selected_page': 'author'
+    }
     template = loader.get_template('authorRecipe.html')
     return HttpResponse(template.render(context, request))
 
 @login_required
 def favorites(request):
     """ Страница для вывода избранных записей текущего пользователя """
-    recipes = models.Recipe.objects.all()
+
+    if 'tags' in request.GET:
+        selected_tags = request.GET['tags']
+        selected_tags = list(selected_tags)
+        recipes = models.Recipe.objects.filter(
+            favorites_recipes__user=request.user.id,
+            tags__name__in=selected_tags
+        ).distinct()
+    else:
+        selected_tags = ['B', 'L', 'D']
+        recipes = models.Recipe.objects.filter(
+            favorites_recipes__user=request.user.id
+        ).all()
+    selected_tags = ''.join(selected_tags)
+
     paginator = Paginator(recipes, 6)
     if 'page' in request.GET:
         page_num = request.GET['page']
@@ -62,7 +104,8 @@ def favorites(request):
         'recipes': recipes,
         'page': page,
         'paginator': paginator,
-        'selected_page': 'favorites'
+        'tags': selected_tags,
+        'selected_page': 'favorites',
     }
     template = loader.get_template('favorite.html')
     return HttpResponse(template.render(context, request))
@@ -125,10 +168,26 @@ def create_recipe(request):
 @login_required
 def follows(request):
     """Страница с отображением подписок"""
-    recipe = models.Recipe.objects.all()
+    recipes = models.Recipe.objects.filter(
+        author__author_is_followed__user=request.user.id
+    ).all().order_by('author')
+
+    authors = models.Follow.objects.filter(
+        user=request.user.id
+    ).all()
+
+    paginator = Paginator(authors, 6)
+    if 'page' in request.GET:
+        page_num = request.GET['page']
+    else:
+        page_num = 1
+    page = paginator.get_page(page_num)
+    
     context = {
-        'recipes': recipe,
-        'selected_page': 'follows'
+        'selected_page': 'follows',
+        'page': page,
+        'paginator': paginator,
+        'selected_page': 'follows',
     }
     template = loader.get_template('myFollow.html')
     return HttpResponse(template.render(context, request))
@@ -137,9 +196,33 @@ def follows(request):
 @login_required
 def purchases(request):
     """Страница с отображением покупок"""
-    recipe = models.Recipe.objects.all()
+    recipes = models.Recipe.objects.filter(
+        recipes_by_purchases__user=request.user.id
+    )
     context = {
-        'recipes': recipe,
+        'recipes': recipes,
+        'selected_page': 'purchases'
+    }
+    template = loader.get_template('shopList.html')
+    return HttpResponse(template.render(context, request))
+
+@login_required
+def purchases_delete(request, recipe_id):
+    """Удалить рецепт из списка покупок"""
+    user = request.user
+    purchase = get_object_or_404(
+        models.Purchase,
+        user=user.id,
+        recipe_id=recipe_id
+    )
+    purchase.delete()
+    
+    recipes = models.Recipe.objects.filter(
+        recipes_by_purchases__user=request.user.id
+    )
+
+    context = {
+        'recipes': recipes,
         'selected_page': 'purchases'
     }
     template = loader.get_template('shopList.html')
@@ -159,3 +242,24 @@ def recipe(request, recipe_id):
     }
     template = loader.get_template('singlePage.html')
     return HttpResponse(template.render(context, request))
+
+
+@login_required
+def delete_recipe(request, recipe_id):
+    """Страница с отображением конкретного рецепта"""
+    recipe = get_object_or_404(models.Recipe, pk=recipe_id)
+    recipe.delete()
+    return redirect('recipes:recipes')
+
+
+def export_pdf(request):
+    buffer = services.get_purchases_pdf(request)
+    return FileResponse(buffer, as_attachment=True, filename='Purchases.pdf')
+
+
+def custom404(request, exception):
+    return render(request, 'error_pages/404.html')
+
+
+def custom500(request, exception):
+    return render(request, 'error_pages/500.html')

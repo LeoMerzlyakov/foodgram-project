@@ -105,13 +105,14 @@
                 <div class="form__field-group">
                     <label for="id_file" class="form__file-button">Выбрать файл</label>
                     <input type="file" class="form__file" name="image" id="id_file">
-                    {% thumbnail recipe.image "380x380" crop="smart" upscale=True  as image %}
-                    <img src="{{ image.url }}" alt="{{ recipe.title }}" class="single-card__image">
                     <span class="form__error"></span>
                 </div>
             </div>
             <div class="form__footer">
-                <button class="button button_style_blue">Сохранить</button> <a style="margin-left: 2.5em" href="#" class="form__ingredient-link">Удалить</a>
+                <button class="button button_style_blue">Сохранить</button>
+                {% if recipe.author == request.user or request.user.is_admin %}
+                    <a style="margin-left: 2.5em" href="{% url 'recipes:delete_recipe' recipe.id %}" class="form__ingredient-link">Удалить</a>
+                {% endif %}
             </div>
         </form>
     </div>

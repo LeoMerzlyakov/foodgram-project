@@ -10,7 +10,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Французские тосты</title>
+    <title>{{recipe.title}}</title>
     <link rel="stylesheet" href="{% static '/pages/single.css' %}">
 </head>
 <body class="body">
@@ -56,13 +56,14 @@
                     <p class="single-card__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
                     <ul class="single-card__items">
                         <li class="single-card__item"><p class="single-card__text"><span class="icon-user"></span> {{ recipe.author }}</p></li>
-                        <li class="single-card__item">  <a style="margin-left: 2.5em" href="{% url 'recipes:recipe_edit' recipe_id=recipe.id %}" class="single-card__text">Редактировать рецепт</a></li>
+                        {% if recipe.author == request.user or request.user.is_admin %}
+                            <li class="single-card__item">  <a style="margin-left: 2.5em" href="{% url 'recipes:recipe_edit' recipe_id=recipe.id %}" class="single-card__text">Редактировать рецепт</a></li>
+                        {% endif %}
                     </ul>
                 </div>
 
                 <ul class="single-card__items">
-                    {% comment %} <li class="single-card__item"><button class="button button_style_blue" name="purchases" data-out><span class="icon-plus"></span> Добавить в покупки</button></li> {% endcomment %}
-                    {% is_in_purchase recipe.author.id recipe.id as in_purchase %} 
+                    {% is_in_purchase request.user.id recipe.id as in_purchase %} 
                     {% if in_purchase %}
                         <button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span> Рецепт добавлен</button>
                     {% else %}
