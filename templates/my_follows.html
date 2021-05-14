@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+{% load thumbnail %}
+{% load recipe_filters %}
+{% load recipe_tags %}
+
+{% block title %}
+    Мои подписки
+{% endblock %}
+
+{% block get_styles %}
+     <link rel="stylesheet" href="{% static '/pages/myFollow.css' %}"/>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <main class="main container">
+        <div class="main__header">
+            <h1 class="main__title">Мои подписки</h1>
+        </div>
+        <div class="card-list">
+            {% for follow in page %}
+                <div class="card-user" data-author="{{ follow.author.id }}">
+                    <div class="card-user__header">
+                        <h2 class="card-user__title">{{ follow.author }}</h2>
+                    </div>
+                    {% get_recipe_by_author_id follow.author.id as recipes %}
+                    <div class="card-user__body">
+                        <ul class="card-user__items">
+                            {% for recipe in recipes|slice:"0:3" %}
+                                <li class="card-user__item">
+                                    <div class="recipe">
+                                        <img src="{{recipe.image.url}}" alt="какой-то-текст" class="recipe__image">
+                                        <h3 class="recipe__title">{{ recipe }}</h3>
+                                        <p class="recipe__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                            <li class="card-user__item">
+                                <a href="{% url 'recipes:recipes_by_author' user_id=follow.author.id %}" class="card-user__link link">
+                                {% recipes_left follow.author.id as count_left %}
+                                Еще
+                                {% if count_left > 0 %}
+                                    {{ count_left }} рецептов
+                                {% endif %}
+                                ...
+                                
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-user__footer">
+                        <button class="button button_style_light-blue button_size_auto" name="subscribe">Отписаться</button>
+                    </div>
+                </div>  
+            {% endfor %}
+        </div>
+        {% if page.has_other_pages %}
+            <nav class="pagination" aria-label="Search results pages">
+                <ul class="pagination__container">
+
+                    {% if page.has_previous %}
+                            <li class="pagination__item"><a class="pagination__link link" href="?page={{ page.previous_page_number }}&tags={{tags}}"><span class="icon-left"></span></a></li>
+                    {% endif %}
+
+                    {% for i in paginator.page_range %}
+                        {% if page.number == i %}
+                            <li class="pagination__item pagination__item_active"><a class="pagination__link link" href="?page={{ i }}&tags={{tags}}">{{ i }}</a></li>
+                        {% else %}
+                            <li class="pagination__item"><a class="pagination__link link" href="?page={{ i }}&tags={{tags}}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+            
+                    {% if page.has_next %}
+                        <li class="pagination__item"><a class="pagination__link link" href="?page={{ page.next_page_number }}&tags={{tags}}"><span class="icon-right"></span></a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </main>
+    <script src="{% static './js/config/config.js' %}"></script>
+    <script src="{% static './js/components/MainCards.js' %}"></script>
+    <script src="{% static './js/components/MyFollow.js' %}"></script>
+    <script src="{% static './js/components/Subscribe.js' %}"></script>
+    <script src="{% static './js/components/Header.js' %}"></script>
+    <script src="{% static './js/api/Api.js' %}"></script>
+    <script src="{% static 'myFollow.js' %}"></script>
+{% endblock %}

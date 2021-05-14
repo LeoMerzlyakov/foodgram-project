@@ -1,1 +1,15 @@
-{{ flatpage.content }}
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}
+    {{ flatpage.title }}
+{% endblock %}
+
+{% block get_styles %}
+    <link rel="stylesheet" href="{% static '/pages/index.css' %}"/>
+{% endblock %}
+
+{% block content %}
+    <h1>{{ flatpage.content }}</h1>
+{% endblock %}

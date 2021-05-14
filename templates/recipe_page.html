@@ -1,22 +1,17 @@
+{% extends "base.html" %}
 {% load static %}
 {% load thumbnail %}
 {% load recipe_tags %}
 
+{% block title %}
+    {{recipe.title}}
+{% endblock %}
 
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{recipe.title}}</title>
+{% block get_styles %}
     <link rel="stylesheet" href="{% static '/pages/single.css' %}">
-</head>
-<body class="body">
+{% endblock %}
 
-{% include "includes/top_block.html" %}
-
+{% block content %}
     <main class="main container">
     {% csrf_token %}
         <div class="single-card" data-id="{{ recipe.id }}" data-author="{{ recipe.author }}">
@@ -96,36 +91,13 @@
             </div>
         </div>
     </main>
-    <footer class="footer">
-        <div class="footer__container container">
-            <a href="#" class="footer__brand link">Продуктовый помощник</a>
-            <ul class="footer__items">
-                <li class="footer__item"><a href="#" class="footer__link link">Об авторе </a></li>
-                <li class="footer__item"><a href="#" class="footer__link link">Технологии</a></li>
-            </ul>
-        </div>
-    </footer>
-<script src="{% static '/js/components/Purchases.js' %}"></script>
-<script src="{% static '/js/components/Favorites.js' %}"></script>
-<script src="{% static '/js/components/Subscribe.js' %}"></script>
-<script src="{% static '/js/config/config.js' %}"></script>
-<script src="{% static '/js/components/MainCards.js' %}"></script>
-<script src="{% static '/js/components/SingleCard.js' %}"></script>
-<script src="{% static '/js/components/Header.js' %}"></script>
-<script src="{% static '/js/api/Api.js' %}"></script>
-<script src="{% static '/singlePage.js' %}"></script>
-
-{% comment %} 
-<script src="./js/components/Purchases.js"></script>
-<script src="./js/components/Favorites.js"></script>
-<script src="./js/components/Subscribe.js"></script>
-<script src="./js/config/config.js"></script>
-
-<script src="./js/components/MainCards.js"></script>
-<script src="./js/components/SingleCard.js"></script>
-<script src="./js/components/Header.js"></script>
-
-<script src="./js/api/Api.js"></script>
-<script src="singlePage.js"></script> {% endcomment %}
-</body>
-</html>
+    <script src="{% static '/js/components/Purchases.js' %}"></script>
+    <script src="{% static '/js/components/Favorites.js' %}"></script>
+    <script src="{% static '/js/components/Subscribe.js' %}"></script>
+    <script src="{% static '/js/config/config.js' %}"></script>
+    <script src="{% static '/js/components/MainCards.js' %}"></script>
+    <script src="{% static '/js/components/SingleCard.js' %}"></script>
+    <script src="{% static '/js/components/Header.js' %}"></script>
+    <script src="{% static '/js/api/Api.js' %}"></script>
+    <script src="{% static '/singlePage.js' %}"></script>
+{% endblock %}

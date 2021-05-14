@@ -13,7 +13,7 @@ from . import views
 app_name = 'users'
 urlpatterns = [
     path('login/', LoginView.as_view(
-        template_name='authForm.html',
+        template_name='login.html',
     ), name='login'),
 
     path('logout/', LogoutView.as_view(
@@ -22,7 +22,7 @@ urlpatterns = [
     ), name='logout'),
 
     path('change_pass/', PasswordChangeView.as_view(
-        template_name='changePassword.html',
+        template_name='change_password.html',
         success_url = reverse_lazy('recipes:recipes'),
     ), name='change_password'),
 
@@ -31,7 +31,7 @@ urlpatterns = [
     ), name='password_change_done'),
 
     path('reset_pass/', PasswordResetView.as_view(
-        template_name='resetPassword.html',
+        template_name='reset_password.html',
         success_url = 'recipes:recipes',
     ), name='reset_password'),
 

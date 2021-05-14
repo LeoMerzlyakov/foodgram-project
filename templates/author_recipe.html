@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load recipe_tags %}
+{% load static %}
+
+{% block title %}
+    Рецепты автора
+{% endblock %}
+
+{% block get_styles %}
+    <link rel="stylesheet" href="{% static '/pages/index.css' %}"/>
+{% endblock %}
+
+{% block content %}
+    <main class="main container">
+        {% csrf_token %}
+        {% include "includes/main_heder.html" %}
+
+        {% if request.user.id != page.object_list.first.author.id %} 
+            {% is_subscubed request.user.id page.object_list.first.author.id as subs_true %} 
+            <div class="author-subscribe" data-author="{{ page.object_list.first.author.id }}">
+                {% if subs_true %}
+                    <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Отписаться от автора</button></p>
+                {% else %}
+                    <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></p>
+                {% endif %} 
+            </div>
+        {% else %}
+            <h1>Мои рецепты</h1>
+        {% endif %}
+        {% include "includes/card_list.html" %}
+
+        {% if page.has_other_pages %}
+            <nav class="pagination" aria-label="Search results pages">
+                <ul class="pagination__container">
+
+                    {% if page.has_previous %}
+                            <li class="pagination__item"><a class="pagination__link link" href="?page={{ page.previous_page_number }}&tags={{tags}}"><span class="icon-left"></span></a></li>
+                    {% endif %}
+
+                    {% for i in paginator.page_range %}
+                        {% if page.number == i %}
+                            <li class="pagination__item pagination__item_active"><a class="pagination__link link" href="?page={{ i }}&tags={{tags}}">{{ i }}</a></li>
+                        {% else %}
+                            <li class="pagination__item"><a class="pagination__link link" href="?page={{ i }}&tags={{tags}}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+            
+                    {% if page.has_next %}
+                        <li class="pagination__item"><a class="pagination__link link" href="?page={{ page.next_page_number }}&tags={{tags}}"><span class="icon-right"></span></a></li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+        {% endif %}
+
+    </main>
+
+    <script src="{% static '/js/components/MainCards.js' %}"></script>
+    <script src="{% static '/js/components/Purchases.js' %}"></script>
+    <script src="{% static '/js/components/Favorites.js' %}"></script>
+    <script src="{% static '/js/components/Subscribe.js' %}"></script>
+    <script src="{% static '/js/config/config.js' %}"></script>
+    <script src="{% static '/js/components/AuthorRecipe.js' %}"></script>
+    <script src="{% static '/js/components/Header.js' %}"></script>
+    <script src="{% static '/js/api/Api.js' %}"></script>
+    <script src="{% static 'authorRecipe.js' %}"></script>
+
+{% endblock %}

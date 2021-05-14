@@ -1,1 +1,12 @@
-404!
+{% extends "base.html" %}
+{% block title %}
+    Ошибка 404
+{% endblock %}
+
+{% block get_styles %}
+    <link rel="stylesheet" href="{% static '/pages/index.css' %}"/>
+{% endblock %}
+
+{% block content %}
+    Ошибка 404!
+{% endblock %}

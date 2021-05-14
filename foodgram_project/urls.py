@@ -35,5 +35,4 @@ urlpatterns = [
     path('', include(recipesurls,  namespace='recipes')),
 ]
 
-
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -23,7 +23,7 @@ def register_user(request):
             return redirect('users:login')
     else:
         form = forms.CreateUserForm()
-    return render(request, 'reg.html', {'form': form})
+    return render(request, 'registration.html', {'form': form})
 
 
 # def loginview(request):

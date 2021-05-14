@@ -38,7 +38,7 @@ def recipes(request):
         'selected_page': 'recipes'
     }
 
-    template = loader.get_template('indexAuth.html')
+    template = loader.get_template('index.html')
     return HttpResponse(template.render(context, request))
 
 
@@ -73,7 +73,7 @@ def user_recipes(request, user_id):
         'tags': selected_tags,
         'selected_page': 'author'
     }
-    template = loader.get_template('authorRecipe.html')
+    template = loader.get_template('author_recipe.html')
     return HttpResponse(template.render(context, request))
 
 @login_required
@@ -128,7 +128,7 @@ def edit_recipes(request, recipe_id):
                    kwargs={'recipe_id': recipe.id}))
         else:
             context = {'form': form}
-            return render(request, 'formChangeRecipe.html', context)
+            return render(request, 'change_recipe.html', context)
     else:
         form = forms.RecipeForm(instance=recipe)
         tags = recipe.tags.values_list('name', flat=True)
@@ -138,7 +138,7 @@ def edit_recipes(request, recipe_id):
             'ingredients': ingredients,
             'tags': tags,
         }
-        return render(request, 'formChangeRecipe.html', context)
+        return render(request, 'change_recipe.html', context)
 
 
 @login_required
@@ -155,14 +155,14 @@ def create_recipe(request):
                 'form': form,
                 'selected_page': 'new_recipe'
             }
-            return render(request, 'formRecipe.html', context)
+            return render(request, 'create_recipe.html', context)
     else:
         form = forms.RecipeForm()
         context = {
                 'form': form,
                 'selected_page': 'new_recipe'
             }
-        return render(request, 'formRecipe.html', context)
+        return render(request, 'create_recipe.html', context)
 
 
 @login_required
@@ -189,7 +189,7 @@ def follows(request):
         'paginator': paginator,
         'selected_page': 'follows',
     }
-    template = loader.get_template('myFollow.html')
+    template = loader.get_template('my_follows.html')
     return HttpResponse(template.render(context, request))
 
 
@@ -203,7 +203,7 @@ def purchases(request):
         'recipes': recipes,
         'selected_page': 'purchases'
     }
-    template = loader.get_template('shopList.html')
+    template = loader.get_template('shop_list.html')
     return HttpResponse(template.render(context, request))
 
 @login_required
@@ -240,7 +240,7 @@ def recipe(request, recipe_id):
         'ingredients': ingrs,
         'is_favorite': is_favorite,
     }
-    template = loader.get_template('singlePage.html')
+    template = loader.get_template('recipe_page.html')
     return HttpResponse(template.render(context, request))
 
 
