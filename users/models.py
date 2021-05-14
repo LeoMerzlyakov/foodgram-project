@@ -1,7 +1,7 @@
-from django.db import models
 from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser
+    AbstractBaseUser, BaseUserManager
 )
+from django.db import models
 
 
 class UserManager(BaseUserManager):
@@ -40,7 +40,7 @@ class User(AbstractBaseUser):
         max_length=255,
         unique=True,
     )
-    username =  models.CharField(
+    username = models.CharField(
         max_length=256,
         verbose_name='Имя пользователя',
         unique=True,

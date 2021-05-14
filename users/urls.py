@@ -1,14 +1,14 @@
-from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.urls import include, path, reverse_lazy, reverse
 from django.contrib.auth.views import (
     LoginView,
     LogoutView,
-    PasswordChangeView,
     PasswordChangeDoneView,
+    PasswordChangeView,
     PasswordResetConfirmView,
     PasswordResetView)
-from django.urls.base import reverse
+from django.urls import path, reverse_lazy
+
 from . import views
+
 
 app_name = 'users'
 urlpatterns = [
@@ -23,7 +23,7 @@ urlpatterns = [
 
     path('change_pass/', PasswordChangeView.as_view(
         template_name='change_password.html',
-        success_url = reverse_lazy('recipes:recipes'),
+        success_url=reverse_lazy('recipes:recipes'),
     ), name='change_password'),
 
     path('change_pass/done/', PasswordChangeDoneView.as_view(
@@ -32,7 +32,7 @@ urlpatterns = [
 
     path('reset_pass/', PasswordResetView.as_view(
         template_name='reset_password.html',
-        success_url = 'recipes:recipes',
+        success_url='recipes:recipes',
     ), name='reset_password'),
 
     path('reset/<uidb64>/<token>/', PasswordResetConfirmView.as_view(

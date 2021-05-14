@@ -1,7 +1,6 @@
-from typing import Callable
 from django.db import models
 from django.db.models.deletion import CASCADE
-from django.db.models.enums import Choices
+
 from users.models import User
 
 
@@ -38,7 +37,7 @@ class Recipe(models.Model):
     slug = models.SlugField()
     cooking_time = models.IntegerField(verbose_name='cooking time')
     pub_date = models.DateTimeField('date published', auto_now_add=True)
-    
+
     class Meta:
         verbose_name = 'recipe by author'
         verbose_name_plural = 'recipes by author'
@@ -79,6 +78,7 @@ class Ingredient(models.Model):
     def __str__(self):
         return f'{self.ingredient}, {self.unit}'
 
+
 class Favorite(models.Model):
     user = models.ForeignKey(
         User,
@@ -108,9 +108,9 @@ class Follow(models.Model):
                                related_name="author_is_followed",
                                blank=True,
                                null=True)
+
     class Meta:
         unique_together = ('author', 'user')
-
 
 
 class Purchase(models.Model):
@@ -124,6 +124,7 @@ class Purchase(models.Model):
                                related_name="recipes_by_purchases",
                                blank=True,
                                null=True)
+
     class Meta:
         unique_together = ('recipe', 'user')
 

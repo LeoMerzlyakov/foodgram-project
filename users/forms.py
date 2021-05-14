@@ -1,6 +1,6 @@
-from django.forms import ModelForm, fields, widgets
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+
 from .models import User
 
 
@@ -16,4 +16,4 @@ class LogInForm(AuthenticationForm):
 
     class Meta():
         model = User
-        fields = ('email','password', 'username',)
+        fields = ('email', 'password', 'username', )

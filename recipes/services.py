@@ -1,15 +1,15 @@
+from django.db import transaction
 from django.shortcuts import get_object_or_404
+
 from recipes.models import (
+    Favorite,
     Ingredient,
     IngredientsValue,
+    Purchase,
     Recipe,
     Tag,
-    Favorite,
-    Purchase,
 )
-from django.db import transaction
-import json
-import ast
+
 
 def get_ingredients(request):
     ingredients = {}
@@ -20,6 +20,7 @@ def get_ingredients(request):
             int_value = post[f'valueIngredient_{num}'].partition(',')[0]
             ingredients[name] = int_value
     return ingredients
+
 
 def clean_ingredients(recipe_id):
     IngredientsValue.objects.filter(recipe=recipe_id).delete()
@@ -45,7 +46,7 @@ def get_tags(request):
     if 'dinner' in post.keys():
         tags.append('D')
     if 'lunch' in post.keys():
-        tags.append('L')    
+        tags.append('L')
     if 'breakfast' in post.keys():
         tags.append('B')
     return tags
@@ -62,7 +63,7 @@ def seve_recipe(request, form, recipe_id=None):
             tag_obj = Tag.objects.filter(name=tag).first()
             new_recipe.tags.add(Tag.objects.get(id=tag_obj.id))
         new_recipe.save()
-        
+
         if recipe_id:
             clean_ingredients(recipe_id)
         ingredient_list = []
@@ -98,7 +99,7 @@ def get_ingredients_and_values(user_id):
             current_name, current_value, current_unit = shop_basket[ingr_id]
             current_value = current_value + ingr_value
             shop_basket[ingr_id] = (current_name, current_value, current_unit)
-    
+
     return shop_basket
 
 
@@ -110,7 +111,6 @@ def get_text(user_id):
         row = current_name + ': ' + str(current_value) + ', ' + current_unit
         text.append(row)
     return header, text
-
 
 
 def get_purchases_pdf(request):
@@ -138,6 +138,7 @@ def get_purchases_pdf(request):
     p.save()
     buffer.seek(0)
     return buffer
+
 
 def make_tag_context(request):
     if 'tags' in request.GET:

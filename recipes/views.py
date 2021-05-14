@@ -1,15 +1,16 @@
-from django.http import FileResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.http.response import HttpResponse, HttpResponseRedirect
-from django.template import context, loader
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.template.defaultfilters import join
+from django.http import FileResponse
+from django.http.response import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
+from django.template import loader
 from django.urls import reverse
-from . import models, services, forms
+
+from . import forms, models, services
 
 User = get_user_model()
+
 
 def recipes(request):
     selected_tags = services.make_tag_context(request)
@@ -23,7 +24,7 @@ def recipes(request):
     else:
         page_num = 1
     page = paginator.get_page(page_num)
-    
+
     context = {
         'recipes': recipes,
         'page': page,
@@ -42,14 +43,14 @@ def user_recipes(request, user_id):
         author=user_id,
         tags__name__in=selected_tags
     ).distinct()
-        
+
     paginator = Paginator(recipes, 6)
     if 'page' in request.GET:
         page_num = request.GET['page']
     else:
         page_num = 1
     page = paginator.get_page(page_num)
-        
+
     context = {
         'recipes': recipes,
         'page': page,
@@ -59,6 +60,7 @@ def user_recipes(request, user_id):
     }
     template = loader.get_template('author_recipe.html')
     return HttpResponse(template.render(context, request))
+
 
 @login_required
 def favorites(request):
@@ -99,8 +101,9 @@ def edit_recipes(request, recipe_id):
         )
         if form.is_valid():
             recipe = services.seve_recipe(request, form, recipe_id)
-            return HttpResponseRedirect(reverse('recipes:recipe', 
-                   kwargs={'recipe_id': recipe.id}))
+            return HttpResponseRedirect(
+                reverse('recipes:recipe', kwargs={'recipe_id': recipe.id})
+            )
         else:
             context = {'form': form}
             return render(request, 'change_recipe.html', context)
@@ -123,8 +126,9 @@ def create_recipe(request):
         form = forms.RecipeForm(request.POST, files=request.FILES or None)
         if form.is_valid():
             recipe = services.seve_recipe(request, form)
-            return HttpResponseRedirect(reverse('recipes:recipe', 
-                   kwargs={'recipe_id': recipe.id}))
+            return HttpResponseRedirect(
+                reverse('recipes:recipe', kwargs={'recipe_id': recipe.id})
+            )
         else:
             context = {
                 'form': form,
@@ -143,9 +147,6 @@ def create_recipe(request):
 @login_required
 def follows(request):
     """Страница с отображением подписок"""
-    recipes = models.Recipe.objects.filter(
-        author__author_is_followed__user=request.user.id
-    ).all().order_by('author')
 
     authors = models.Follow.objects.filter(
         user=request.user.id
@@ -157,9 +158,8 @@ def follows(request):
     else:
         page_num = 1
     page = paginator.get_page(page_num)
-    
+
     context = {
-        'selected_page': 'follows',
         'page': page,
         'paginator': paginator,
         'selected_page': 'follows',
@@ -181,6 +181,7 @@ def purchases(request):
     template = loader.get_template('shop_list.html')
     return HttpResponse(template.render(context, request))
 
+
 @login_required
 def purchases_delete(request, recipe_id):
     """Удалить рецепт из списка покупок"""
@@ -191,11 +192,10 @@ def purchases_delete(request, recipe_id):
         recipe_id=recipe_id
     )
     purchase.delete()
-    
+
     recipes = models.Recipe.objects.filter(
         recipes_by_purchases__user=request.user.id
     )
-
     context = {
         'recipes': recipes,
         'selected_page': 'purchases'

@@ -19,6 +19,7 @@ class UserCreationForm(forms.ModelForm):
 
 class UserChangeForm(forms.ModelForm):
     """A form for updating users."""
+
     password = ReadOnlyPasswordHashField()
 
     class Meta:
@@ -27,7 +28,8 @@ class UserChangeForm(forms.ModelForm):
 
 
 class UserAdmin(BaseUserAdmin):
-    """A form to add and change user instances.""" 
+    """A form to add and change user instances."""
+
     form = UserChangeForm
     add_form = UserCreationForm
 

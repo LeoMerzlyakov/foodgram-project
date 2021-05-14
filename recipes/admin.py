@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Recipe, Ingredient, Tag, IngredientsValue
+from .models import Ingredient, IngredientsValue, Recipe, Tag
 
 
 # class IngredientInline(admin.StackedInline):
@@ -16,7 +16,8 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ('pk', 'title', 'slug')
     list_filter = ('title', 'slug')
     empty_value_display = '-empty-'
-    inlines = [IngredientsValueInline,]
+    inlines = [IngredientsValueInline, ]
+
 
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('pk', 'ingredient', 'unit', )

@@ -4,7 +4,8 @@ from django.template.defaultfilters import stringfilter
 
 register = template.Library()
 
-@register.filter(name='check_tags')
+
+@register.filter()
 @stringfilter
 def check_tags(selected_tags, current_tag):
     selected_tags = list(selected_tags)
