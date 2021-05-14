@@ -138,3 +138,12 @@ def get_purchases_pdf(request):
     p.save()
     buffer.seek(0)
     return buffer
+
+def make_tag_context(request):
+    if 'tags' in request.GET:
+        selected_tags = request.GET['tags']
+        selected_tags = list(selected_tags)
+    else:
+        selected_tags = ['B', 'L', 'D']
+    selected_tags = ''.join(selected_tags)
+    return selected_tags

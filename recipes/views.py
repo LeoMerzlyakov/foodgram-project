@@ -12,16 +12,10 @@ from . import models, services, forms
 User = get_user_model()
 
 def recipes(request):
-    if 'tags' in request.GET:
-        selected_tags = request.GET['tags']
-        selected_tags = list(selected_tags)
-        recipes = models.Recipe.objects.filter(
-            tags__name__in=selected_tags
-        ).distinct()
-    else:
-        selected_tags = ['B', 'L', 'D']
-        recipes = models.Recipe.objects.all()
-    selected_tags = ''.join(selected_tags)
+    selected_tags = services.make_tag_context(request)
+    recipes = models.Recipe.objects.filter(
+        tags__name__in=selected_tags
+    ).distinct()
 
     paginator = Paginator(recipes, 6)
     if 'page' in request.GET:
@@ -43,29 +37,19 @@ def recipes(request):
 
 
 def user_recipes(request, user_id):
-    recipes = models.Recipe.objects.filter(author=user_id)
-
-    if 'tags' in request.GET:
-        selected_tags = request.GET['tags']
-        selected_tags = list(selected_tags)
-        recipes = models.Recipe.objects.filter(
-            author=user_id,
-            tags__name__in=selected_tags
-        ).distinct()
-    else:
-        selected_tags = ['B', 'L', 'D']
-        recipes = models.Recipe.objects.filter(author=user_id)
-    selected_tags = ''.join(selected_tags)
-
+    selected_tags = services.make_tag_context(request)
+    recipes = models.Recipe.objects.filter(
+        author=user_id,
+        tags__name__in=selected_tags
+    ).distinct()
+        
     paginator = Paginator(recipes, 6)
     if 'page' in request.GET:
         page_num = request.GET['page']
     else:
         page_num = 1
     page = paginator.get_page(page_num)
-    
-    selected_tags = ''.join(selected_tags)
-    
+        
     context = {
         'recipes': recipes,
         'page': page,
@@ -79,20 +63,11 @@ def user_recipes(request, user_id):
 @login_required
 def favorites(request):
     """ Страница для вывода избранных записей текущего пользователя """
-
-    if 'tags' in request.GET:
-        selected_tags = request.GET['tags']
-        selected_tags = list(selected_tags)
-        recipes = models.Recipe.objects.filter(
-            favorites_recipes__user=request.user.id,
-            tags__name__in=selected_tags
-        ).distinct()
-    else:
-        selected_tags = ['B', 'L', 'D']
-        recipes = models.Recipe.objects.filter(
-            favorites_recipes__user=request.user.id
-        ).all()
-    selected_tags = ''.join(selected_tags)
+    selected_tags = services.make_tag_context(request)
+    recipes = models.Recipe.objects.filter(
+        favorites_recipes__user=request.user.id,
+        tags__name__in=list(selected_tags)
+    ).distinct()
 
     paginator = Paginator(recipes, 6)
     if 'page' in request.GET:

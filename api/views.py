@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from users.models import User
 from django.shortcuts import get_object_or_404
 from django.db import InternalError
+from rest_framework.permissions import IsAuthenticated
 
 from .serializers import (
     FavoriteSerializer,
@@ -32,6 +33,9 @@ class FavoriteViewSet(viewsets.ViewSet):
     """
     A ViewSet for create or delete favorites records.
     """
+
+    permission_classes = [IsAuthenticated]
+
     def create(self, request):
         data=request.data
         data['user'] = request.user
@@ -56,6 +60,8 @@ class PurchasesViewSet(viewsets.ViewSet):
     """
     A ViewSet for create or delete purchases records.
     """
+    permission_classes = [IsAuthenticated]
+
     def create(self, request):
         data=request.data
         data['recipe'] = request.data['id']
@@ -79,6 +85,9 @@ class SubscriptionViewSet(viewsets.ViewSet):
     """
     A ViewSet for create or delete Subscription.
     """
+
+    permission_classes = [IsAuthenticated]
+    
     def create(self, request):
         try:
             author = get_object_or_404(User, pk=int(request.data['id']))
