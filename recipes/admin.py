@@ -3,10 +3,6 @@ from django.contrib import admin
 from .models import Ingredient, IngredientsValue, Recipe, Tag
 
 
-# class IngredientInline(admin.StackedInline):
-#     model = Ingredient
-#     filter_horizontal = ()
-
 class IngredientsValueInline(admin.TabularInline):
     model = IngredientsValue
     extra = 1

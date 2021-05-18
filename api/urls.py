@@ -18,6 +18,6 @@ router.register('purchases', PurchasesViewSet, basename='purchases')
 router.register('subscriptions', SubscriptionViewSet, basename='subscription')
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('ingredients', ingredients_found),
+    path('v1/', include(router.urls)),
+    path('v1/ingredients', ingredients_found),
 ]

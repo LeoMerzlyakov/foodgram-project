@@ -22,7 +22,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(error_msg)
 
 
-class PurchseSerializer(serializers.ModelSerializer):
+class PurchaseSerializer(serializers.ModelSerializer):
     """Serializer for Purchase model"""
 
     class Meta:

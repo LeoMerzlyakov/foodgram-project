@@ -7,7 +7,7 @@ from users.models import User
 class Recipe(models.Model):
     author = models.ForeignKey(
         User,
-        on_delete=models.SET('deleted'),
+        on_delete=CASCADE,
         related_name='recipes_by_author',
         verbose_name='recipe author',
     )
@@ -35,7 +35,9 @@ class Recipe(models.Model):
         verbose_name='tag for recipe',
     )
     slug = models.SlugField()
-    cooking_time = models.IntegerField(verbose_name='cooking time')
+    cooking_time = models.PositiveIntegerField(
+        verbose_name='cooking time'
+    )
     pub_date = models.DateTimeField('date published', auto_now_add=True)
 
     class Meta:
@@ -57,26 +59,45 @@ class IngredientsValue(models.Model):
 
 
 class Tag(models.Model):
-    TAG = (
-        ('B', 'breakfast'),
-        ('L', 'lunch'),
-        ('D', 'dinner'),
-    )
+    BREAKFAST = 'B'
+    LUNCH = 'L'
+    DINNER = 'D'
+
+    TAG_CHOISE = [
+        (BREAKFAST, 'Breakfast'),
+        (LUNCH, 'Lunch'),
+        (DINNER, 'Dinner'),
+    ]
+
     name = models.CharField(
         max_length=1,
-        choices=TAG,
+        choices=TAG_CHOISE,
+        verbose_name='Tag name (Breakfast/Lunch/Dinner)'
     )
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Tag name'
+        verbose_name_plural = 'Tag names'
+        ordering = ['-id']
+
 
 class Ingredient(models.Model):
-    ingredient = models.CharField(max_length=255)
-    unit = models.CharField(max_length=64)
+    ingredient = models.CharField(
+        max_length=255,
+        verbose_name='ingredient name'
+    )
+    unit = models.CharField(max_length=64, verbose_name='ingredient units')
 
     def __str__(self):
         return f'{self.ingredient}, {self.unit}'
+
+    class Meta:
+        verbose_name = 'Ingredient'
+        verbose_name_plural = 'Ingredients'
+        ordering = ['-id']
 
 
 class Favorite(models.Model):
@@ -91,7 +112,13 @@ class Favorite(models.Model):
     )
 
     class Meta:
-        unique_together = ('recipe', 'user')
+        verbose_name = 'Favorite'
+        verbose_name_plural = 'Favorites'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'user'], name='unique Favorite instance'
+            )
+        ]
 
     def __str__(self):
         return f'{self.user} - {self.recipe}'
@@ -110,7 +137,13 @@ class Follow(models.Model):
                                null=True)
 
     class Meta:
-        unique_together = ('author', 'user')
+        verbose_name = 'Follow'
+        verbose_name_plural = 'Follows'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'user'], name='unique Follow instance'
+            )
+        ]
 
 
 class Purchase(models.Model):
@@ -126,7 +159,13 @@ class Purchase(models.Model):
                                null=True)
 
     class Meta:
-        unique_together = ('recipe', 'user')
+        verbose_name = 'Purchase'
+        verbose_name_plural = 'Purchases'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'user'], name='unique Purchase instance'
+            )
+        ]
 
     def __str__(self):
         return f'{self.user} - {self.recipe}'

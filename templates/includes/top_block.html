@@ -18,7 +18,7 @@
                         <a href="{% url 'recipes:favorites' %}" class="nav__link link">Избранное</a></li>
 
                     <li class="nav__item {% if selected_page == 'purchases'%} nav__item_active {% endif %} ">
-                        <a href="{% url 'recipes:purchases' %}" class="nav__link link">Список покупок</a> <span class="badge badge_style_blue nav__badge" id="counter">{% purchase_count request.user.id%}</span></li>
+                        <a href="{% url 'recipes:purchases' %}" class="nav__link link">Список покупок</a> <span class="badge badge_style_blue nav__badge" id="counter">{% purchase_count request.user.id %}</span></li>
 
                 </ul>
                 <ul class="nav__items list">

@@ -11,7 +11,9 @@ register = template.Library()
 
 @register.simple_tag()
 def is_in_purchase(user, recipe):
-    return Purchase.objects.filter(user=user, recipe=recipe).exists()
+    return Recipe.objects.filter(
+        recipes_by_purchases__user=user, recipes_by_purchases__recipe=recipe
+    ).exists()
 
 
 @register.simple_tag()
@@ -26,8 +28,10 @@ def purchase_count(user):
 
 @register.simple_tag()
 def is_subscubed(user, author):
-    subs = Follow.objects.filter(user=user, author=author).exists()
-    return subs
+    if author != '':
+        return Follow.objects.filter(user=user, author=author).exists()
+    else:
+        return False
 
 
 @register.simple_tag()
@@ -42,10 +46,12 @@ def get_recipe_by_author_id(author_id):
 
 
 @register.simple_tag()
-def get_main_header_name(page_name, author_id):
+def get_main_header_name(page_name, author_id=''):
     if page_name == 'author':
-        author = get_object_or_404(User, pk=author_id)
-        return author
+        if author_id != '':
+            return get_object_or_404(User, pk=author_id)
+        else:
+            return ''
     elif page_name == 'recipes':
         return 'Рецепты'
     elif page_name == 'favorites':
@@ -54,6 +60,10 @@ def get_main_header_name(page_name, author_id):
         return 'Мои подписки'
     elif page_name == 'purchases':
         return 'Список покупок'
+    elif page_name == 'new_recipe':
+        return 'Создание рецепта'
+    elif page_name == 'edit_recipe':
+        return 'Редактирование рецепта'    
     return 'Unnamed page!'
 
 

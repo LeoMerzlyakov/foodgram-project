@@ -4,7 +4,7 @@
 {% load recipe_tags %}
 
 {% block title %}
-    {{recipe.title}}
+    {{ recipe.title }}
 {% endblock %}
 
 {% block get_styles %}
@@ -21,7 +21,8 @@
                 <div class="single-card__header-info">
                     <h1 class="single-card__title">{{ recipe.title }}</h1>
                     <div class="single-card__favorite">
-                        {% if is_favorite == False %}
+                        {% is_favorite request.user.id recipe.id as star_active %}
+                        {% if star_active == False %}
                             <button class="button button_style_none" name="favorites" data-out ><span class="icon-favorite icon-favorite_big"></span></button>
                         {% else %}
                             <button class="button button_style_none" name="favorites"><span class="icon-favorite icon-favorite_active"></span></button>
@@ -33,7 +34,7 @@
 
                 <ul class="single-card__items">
                     {% for t in recipe.tags.all %}
-                        {%if t.name == 'L' %}
+                        {% if t.name == 'L' %}
                             <li class="single-card__item"><span class="badge badge_style_green">Обед</span></li>
                         {% endif %}
 
@@ -79,7 +80,7 @@
                     <h3 class="single-card__section-title">Ингридиенты:</h3>
                     <div class="single-card__items single-card__items_column">
                         {% for ingr in ingredients %}
-                            <p class=" single-card__section-item">{{ingr.ingredient.ingredient}} - {{ingr.value}} {{ingr.ingredient.unit}}</p>
+                            <p class=" single-card__section-item">{{ ingr.ingredient.ingredient }} - {{ ingr.value }} {{ ingr.ingredient.unit }}</p>
                         {% endfor %}
                 </div>
 

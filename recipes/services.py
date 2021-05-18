@@ -1,11 +1,10 @@
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from recipes.models import (
-    Favorite,
     Ingredient,
     IngredientsValue,
-    Purchase,
     Recipe,
     Tag,
 )
@@ -32,23 +31,15 @@ def clear_tags(recipe_id):
         recipe.tags.clear()
 
 
-def is_favorite(recipe, user):
-    return Favorite.objects.filter(user=user, recipe=recipe).exists()
-
-
-def is_in_purchase(recipe, user):
-    return Purchase.objects.filter(user=user, recipe=recipe).exists()
-
-
 def get_tags(request):
     tags = []
     post = request.POST
-    if 'dinner' in post.keys():
-        tags.append('D')
-    if 'lunch' in post.keys():
-        tags.append('L')
-    if 'breakfast' in post.keys():
-        tags.append('B')
+    if 'dinner' in post:
+        tags.append(Tag.DINNER)
+    if 'lunch' in post:
+        tags.append(Tag.LUNCH)
+    if 'breakfast' in post:
+        tags.append(Tag.BREAKFAST)
     return tags
 
 
@@ -60,8 +51,8 @@ def seve_recipe(request, form, recipe_id=None):
         tags = get_tags(request)
         clear_tags(recipe_id)
         for tag in tags:
-            tag_obj = Tag.objects.filter(name=tag).first()
-            new_recipe.tags.add(Tag.objects.get(id=tag_obj.id))
+            tag_obj = get_object_or_404(Tag, name=tag)
+            new_recipe.tags.add(tag_obj)
         new_recipe.save()
 
         if recipe_id:
@@ -85,7 +76,7 @@ def seve_recipe(request, form, recipe_id=None):
 def get_ingredients_and_values(user_id):
     ingredients = IngredientsValue.objects.filter(
         recipe__recipes_by_purchases__user_id=user_id
-    ).all()
+    )
 
     shop_basket = {}
     for ingredient in ingredients:
@@ -93,7 +84,7 @@ def get_ingredients_and_values(user_id):
         ingr_name = ingredient.ingredient.ingredient
         ingr_id = ingredient.ingredient.pk
         ingr_unit = ingredient.ingredient.unit
-        if ingr_id not in shop_basket.keys():
+        if ingr_id not in shop_basket:
             shop_basket[ingr_id] = (ingr_name, ingr_value, ingr_unit)
         else:
             current_name, current_value, current_unit = shop_basket[ingr_id]
@@ -145,6 +136,27 @@ def make_tag_context(request):
         selected_tags = request.GET['tags']
         selected_tags = list(selected_tags)
     else:
-        selected_tags = ['B', 'L', 'D']
+        selected_tags = [
+            Tag.BREAKFAST,
+            Tag.LUNCH,
+            Tag.DINNER
+        ]
     selected_tags = ''.join(selected_tags)
     return selected_tags
+
+
+def get_paginator(request, obj_list):
+    # Paginator.per_page Required. The maximum number of items to include
+    # on a page, not including orphans.
+    # https://docs.djangoproject.com/en/3.2/ref/paginator/#django.core.paginator.Paginator.per_page
+    paginator = Paginator(obj_list, 6)
+    if 'page' in request.GET:
+        page_num = request.GET['page']
+    else:
+        page_num = 1
+    page = paginator.get_page(page_num)
+    return page, paginator
+
+
+def get_form_name(instance_id):
+    return 'edit_recipe' if instance_id else 'new_recipe'

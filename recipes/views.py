@@ -2,9 +2,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import FileResponse
-from django.http.response import HttpResponse, HttpResponseRedirect
+from django.http.response import (
+    Http404, HttpResponse, HttpResponseRedirect
+)
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
+from django.template.exceptions import TemplateDoesNotExist
 from django.urls import reverse
 
 from . import forms, models, services
@@ -17,13 +20,8 @@ def recipes(request):
     recipes = models.Recipe.objects.filter(
         tags__name__in=selected_tags
     ).distinct()
-
-    paginator = Paginator(recipes, 6)
-    if 'page' in request.GET:
-        page_num = request.GET['page']
-    else:
-        page_num = 1
-    page = paginator.get_page(page_num)
+    
+    page, paginator = services.get_paginator(request, recipes)
 
     context = {
         'recipes': recipes,
@@ -33,8 +31,9 @@ def recipes(request):
         'selected_page': 'recipes'
     }
 
-    template = loader.get_template('index.html')
-    return HttpResponse(template.render(context, request))
+    return render(request, 'index.html', context)
+    # template = loader.get_template('index.html')
+    # return HttpResponse(template.render(context, request))
 
 
 def user_recipes(request, user_id):
@@ -44,12 +43,7 @@ def user_recipes(request, user_id):
         tags__name__in=selected_tags
     ).distinct()
 
-    paginator = Paginator(recipes, 6)
-    if 'page' in request.GET:
-        page_num = request.GET['page']
-    else:
-        page_num = 1
-    page = paginator.get_page(page_num)
+    page, paginator = services.get_paginator(request, recipes)
 
     context = {
         'recipes': recipes,
@@ -58,8 +52,9 @@ def user_recipes(request, user_id):
         'tags': selected_tags,
         'selected_page': 'author'
     }
-    template = loader.get_template('author_recipe.html')
-    return HttpResponse(template.render(context, request))
+    return render(request, 'author_recipe.html', context)
+    # template = loader.get_template('author_recipe.html')
+    # return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -71,12 +66,8 @@ def favorites(request):
         tags__name__in=list(selected_tags)
     ).distinct()
 
-    paginator = Paginator(recipes, 6)
-    if 'page' in request.GET:
-        page_num = request.GET['page']
-    else:
-        page_num = 1
-    page = paginator.get_page(page_num)
+    page, paginator = services.get_paginator(request, recipes)
+
     context = {
         'recipes': recipes,
         'page': page,
@@ -84,8 +75,9 @@ def favorites(request):
         'tags': selected_tags,
         'selected_page': 'favorites',
     }
-    template = loader.get_template('favorite.html')
-    return HttpResponse(template.render(context, request))
+    return render(request, 'favorite.html', context)
+    # template = loader.get_template('favorite.html')
+    # return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -93,28 +85,24 @@ def edit_recipes(request, recipe_id):
     """Страница с формой редактирования рецепта"""
     recipe = get_object_or_404(models.Recipe, pk=recipe_id)
     ingredients = models.IngredientsValue.objects.filter(recipe=recipe)
-    if request.method == 'POST':
-        form = forms.RecipeForm(
-            request.POST,
-            instance=recipe,
-            files=request.FILES or None
-        )
-        if form.is_valid():
-            recipe = services.seve_recipe(request, form, recipe_id)
-            return HttpResponseRedirect(
-                reverse('recipes:recipe', kwargs={'recipe_id': recipe.id})
-            )
-        else:
-            context = {'form': form}
-            return render(request, 'change_recipe.html', context)
+
+    form = forms.RecipeForm(
+        request.POST or None ,
+        instance=recipe,
+        files=request.FILES or None
+    )
+    if form.is_valid():
+        recipe = services.seve_recipe(request, form, recipe_id)
+        return redirect('recipes:recipe', recipe_id=recipe.id)
     else:
-        form = forms.RecipeForm(instance=recipe)
+        page = services.get_form_name(form.instance.id)
         tags = recipe.tags.values_list('name', flat=True)
         context = {
             'form': form,
             'recipe': recipe,
             'ingredients': ingredients,
             'tags': tags,
+            'selected_page': page
         }
         return render(request, 'change_recipe.html', context)
 
@@ -122,26 +110,30 @@ def edit_recipes(request, recipe_id):
 @login_required
 def create_recipe(request):
     """Страница с формой создания рецепта"""
-    if request.method == 'POST':
-        form = forms.RecipeForm(request.POST, files=request.FILES or None)
-        if form.is_valid():
-            recipe = services.seve_recipe(request, form)
-            return HttpResponseRedirect(
-                reverse('recipes:recipe', kwargs={'recipe_id': recipe.id})
-            )
-        else:
-            context = {
-                'form': form,
-                'selected_page': 'new_recipe'
-            }
-            return render(request, 'create_recipe.html', context)
+    form = forms.RecipeForm(
+        request.POST or None,
+        files=request.FILES or None
+    )
+    if form.is_valid():
+        recipe = services.seve_recipe(request, form)
+        return redirect('recipes:recipe', recipe_id=recipe.id)
     else:
-        form = forms.RecipeForm()
-        context = {
-                'form': form,
-                'selected_page': 'new_recipe'
+        recipe = {}
+        if form.data:
+            recipe = {
+                'title': form.data['title'],
+                'image': form.data['image'],
+                'description': form.data['description'],
+                'cooking_time': form.data['cooking_time'],
             }
-        return render(request, 'create_recipe.html', context)
+        page = services.get_form_name(form.instance.id)
+
+        context = {
+            'form': form,
+            'recipe': recipe,
+            'selected_page': page
+        }
+        return render(request, 'change_recipe.html', context)
 
 
 @login_required
@@ -164,8 +156,9 @@ def follows(request):
         'paginator': paginator,
         'selected_page': 'follows',
     }
-    template = loader.get_template('my_follows.html')
-    return HttpResponse(template.render(context, request))
+    return render(request, 'my_follows.html', context)
+    # template = loader.get_template('my_follows.html')
+    # return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -178,8 +171,9 @@ def purchases(request):
         'recipes': recipes,
         'selected_page': 'purchases'
     }
-    template = loader.get_template('shop_list.html')
-    return HttpResponse(template.render(context, request))
+    return render(request, 'shop_list.html', context)
+    # template = loader.get_template('shop_list.html')
+    # return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -200,8 +194,9 @@ def purchases_delete(request, recipe_id):
         'recipes': recipes,
         'selected_page': 'purchases'
     }
-    template = loader.get_template('shopList.html')
-    return HttpResponse(template.render(context, request))
+    return render(request, 'shop_list.html', context)
+    # template = loader.get_template('shop_list.html')
+    # return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -209,14 +204,13 @@ def recipe(request, recipe_id):
     """Страница с отображением конкретного рецепта"""
     recipe = get_object_or_404(models.Recipe, pk=recipe_id)
     ingrs = models.IngredientsValue.objects.filter(recipe=recipe.pk)
-    is_favorite = services.is_favorite(recipe_id, request.user.id)
     context = {
         'recipe': recipe,
         'ingredients': ingrs,
-        'is_favorite': is_favorite,
     }
-    template = loader.get_template('recipe_page.html')
-    return HttpResponse(template.render(context, request))
+    return render(request, 'recipe_page.html', context)
+    # template = loader.get_template('recipe_page.html')
+    # return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -232,9 +226,33 @@ def export_pdf(request):
     return FileResponse(buffer, as_attachment=True, filename='Purchases.pdf')
 
 
-def custom404(request, exception):
-    return render(request, 'error_pages/404.html')
+def page_not_found(request, exception):
+    response = render(request, '404.html')
+    response.status_code = 404
+    return response
 
 
-def custom500(request, exception):
-    return render(request, 'error_pages/500.html')
+def forbidden(request, exception):
+    response = render(request, '404.html')
+    response.status_code = 403
+    return response
+
+
+def bed_request(request, exception):
+    response = render(request, '404.html')
+    response.status_code = 400
+    return response
+
+
+def interall_error(request):
+    response = render(request, '500.html')
+    response.status_code = 500
+    return response
+
+
+def other_page(request, page):
+    try:
+        template = loader.get_template('flatpages/' + page + '.html')
+    except TemplateDoesNotExist:
+        raise Http404
+    return render(request, template.template.name)

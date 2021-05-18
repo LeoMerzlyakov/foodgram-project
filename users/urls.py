@@ -35,7 +35,7 @@ urlpatterns = [
         success_url='recipes:recipes',
     ), name='reset_password'),
 
-    path('reset/<uidb64>/<token>/', PasswordResetConfirmView.as_view(
+    path('reset/<str:uidb64>/<str:token>/', PasswordResetConfirmView.as_view(
     ), name='password_reset_confirm'),
 
     path('register/', views.register_user, name='register'),
