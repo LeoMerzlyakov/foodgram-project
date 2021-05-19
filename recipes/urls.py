@@ -60,4 +60,3 @@ urlpatterns = [
     ),
     path('pages/<str:page>', views.other_page, name='other'),
 ]
-

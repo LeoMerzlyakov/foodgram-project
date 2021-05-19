@@ -1,0 +1,19 @@
+# Ignore everything
+**
+
+# Allowed
+!api/
+!assets/
+!foodgram_project
+!recipes
+!templates
+!users/
+!manage.py
+!DejaVuSansCondensed.ttf
+!requirements.txt
+
+# Override allowed
+.idea/
+__pycache__/
+*.py[cod]
+*$py.class
