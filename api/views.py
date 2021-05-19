@@ -85,27 +85,6 @@ class SubscriptionViewSet(CustomViewSet):
     queryset = Follow.objects.all()
     serializer_class = SubscriptionSerializer
 
-    def create_not_used(self, request, *args, **kwargs):
-        if request.data.get('id'):
-            author = get_author_instance(request.data.get('id'))
-            data = {
-                'author': author.pk,
-                'user': request.user.pk,
-            }
-            serializer = self.get_serializer(data=data)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED,
-                headers=headers
-            )
-        return Response(
-            status=status.HTTP_400_BAD_REQUEST,
-            data={'success': False}
-        )
-
     def perform_create(self, serializer):
         author = get_author_instance(self.request.data.get('id'))
         serializer.save(user=self.request.user, author=author)

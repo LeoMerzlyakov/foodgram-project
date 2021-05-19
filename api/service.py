@@ -16,6 +16,6 @@ def get_ingredients(text_name):
 def get_author_instance(param):
     try:
         param = int(param)
-        return get_object_or_404(User, pk=int(param))
+        return get_object_or_404(User, pk=param)
     except ValueError:
         return get_object_or_404(User, username=param)

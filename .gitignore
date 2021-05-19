@@ -2,6 +2,9 @@
 static/
 media/
 .vscode/
+.dockerignore
+docker-compose.yaml
+dockerfile
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
