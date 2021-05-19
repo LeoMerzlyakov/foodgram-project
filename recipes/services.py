@@ -146,9 +146,6 @@ def make_tag_context(request):
 
 
 def get_paginator(request, obj_list):
-    # Paginator.per_page Required. The maximum number of items to include
-    # on a page, not including orphans.
-    # https://docs.djangoproject.com/en/3.2/ref/paginator/#django.core.paginator.Paginator.per_page
     paginator = Paginator(obj_list, 6)
     if 'page' in request.GET:
         page_num = request.GET['page']

@@ -4,24 +4,23 @@
 <head>
   <title>
     {% block title %}
-      Заголовок не прошёл!
+
     {% endblock %}
   </title>
 
     {% block get_styles %}
-      Стили не прошли!
+
     {% endblock %}
 
-  {% comment %} <link rel="stylesheet" href="{% static '/pages/index.css' %}"/> {% endcomment %}
 </head>
-<body>
-    {% include "includes/top_block.html" %}
-    
-    {% block content %}
-        Контент не прошёл!
-    {% endblock %}
-    
-    {% include "includes/botomn.html" %}
+  <body>
+      {% include "includes/top_block.html" %}
+      
+      {% block content %}
 
-</body>
+      {% endblock %}
+      
+      {% include "includes/botomn.html" %}
+
+  </body>
 </html>

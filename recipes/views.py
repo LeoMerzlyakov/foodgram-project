@@ -2,13 +2,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import FileResponse
-from django.http.response import (
-    Http404, HttpResponse, HttpResponseRedirect
-)
+from django.http.response import (Http404)
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.template.exceptions import TemplateDoesNotExist
-from django.urls import reverse
 
 from . import forms, models, services
 
@@ -32,8 +29,6 @@ def recipes(request):
     }
 
     return render(request, 'index.html', context)
-    # template = loader.get_template('index.html')
-    # return HttpResponse(template.render(context, request))
 
 
 def user_recipes(request, user_id):
@@ -53,8 +48,6 @@ def user_recipes(request, user_id):
         'selected_page': 'author'
     }
     return render(request, 'author_recipe.html', context)
-    # template = loader.get_template('author_recipe.html')
-    # return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -76,8 +69,6 @@ def favorites(request):
         'selected_page': 'favorites',
     }
     return render(request, 'favorite.html', context)
-    # template = loader.get_template('favorite.html')
-    # return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -140,25 +131,14 @@ def create_recipe(request):
 def follows(request):
     """Страница с отображением подписок"""
 
-    authors = models.Follow.objects.filter(
-        user=request.user.id
-    ).all()
-
-    paginator = Paginator(authors, 6)
-    if 'page' in request.GET:
-        page_num = request.GET['page']
-    else:
-        page_num = 1
-    page = paginator.get_page(page_num)
-
+    authors = models.Follow.objects.filter(user=request.user.id)
+    page, paginator = services.get_paginator(request, authors)
     context = {
         'page': page,
         'paginator': paginator,
         'selected_page': 'follows',
     }
     return render(request, 'my_follows.html', context)
-    # template = loader.get_template('my_follows.html')
-    # return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -172,21 +152,17 @@ def purchases(request):
         'selected_page': 'purchases'
     }
     return render(request, 'shop_list.html', context)
-    # template = loader.get_template('shop_list.html')
-    # return HttpResponse(template.render(context, request))
 
 
 @login_required
 def purchases_delete(request, recipe_id):
     """Удалить рецепт из списка покупок"""
-    user = request.user
     purchase = get_object_or_404(
         models.Purchase,
-        user=user.id,
+        user=request.user.id,
         recipe_id=recipe_id
     )
     purchase.delete()
-
     recipes = models.Recipe.objects.filter(
         recipes_by_purchases__user=request.user.id
     )
@@ -195,8 +171,6 @@ def purchases_delete(request, recipe_id):
         'selected_page': 'purchases'
     }
     return render(request, 'shop_list.html', context)
-    # template = loader.get_template('shop_list.html')
-    # return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -209,8 +183,6 @@ def recipe(request, recipe_id):
         'ingredients': ingrs,
     }
     return render(request, 'recipe_page.html', context)
-    # template = loader.get_template('recipe_page.html')
-    # return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -224,30 +196,6 @@ def delete_recipe(request, recipe_id):
 def export_pdf(request):
     buffer = services.get_purchases_pdf(request)
     return FileResponse(buffer, as_attachment=True, filename='Purchases.pdf')
-
-
-def page_not_found(request, exception):
-    response = render(request, '404.html')
-    response.status_code = 404
-    return response
-
-
-def forbidden(request, exception):
-    response = render(request, '404.html')
-    response.status_code = 403
-    return response
-
-
-def bed_request(request, exception):
-    response = render(request, '404.html')
-    response.status_code = 400
-    return response
-
-
-def interall_error(request):
-    response = render(request, '500.html')
-    response.status_code = 500
-    return response
 
 
 def other_page(request, page):

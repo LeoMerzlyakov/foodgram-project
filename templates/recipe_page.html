@@ -38,11 +38,11 @@
                             <li class="single-card__item"><span class="badge badge_style_green">Обед</span></li>
                         {% endif %}
 
-                        {%if t.name == 'B' %}
+                        {% if t.name == 'B' %}
                             <li class="single-card__item"><span class="badge badge_style_orange">Завтрак</span></li>
                         {% endif %}
 
-                        {%if t.name == 'D' %}
+                        {% if t.name == 'D' %}
                             <li class="single-card__item"><span class="badge badge_style_purple">Ужин</span></li>
                         {% endif %}
                     {% endfor %}
@@ -67,12 +67,12 @@
                     {% endif %}  
                 
                     <li class="single-card__item">
-                    {% is_subscubed request.user.id recipe.author.id as subs_true %} 
-                    {% if subs_true %}
-                        <button class="button button_style_light-blue-outline button_size_subscribe" name="subscribe">Отписаться от автора</button>
-                    {% else %}
-                        <button class="button button_style_light-blue-outline button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button>
-                    {% endif %}
+                        {% is_subscubed request.user.id recipe.author.id as subs_true %} 
+                        {% if subs_true %}
+                            <button class="button button_style_light-blue-outline button_size_subscribe" name="subscribe">Отписаться от автора</button>
+                        {% else %}
+                            <button class="button button_style_light-blue-outline button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button>
+                        {% endif %}
                     </li>
                 </ul>
 

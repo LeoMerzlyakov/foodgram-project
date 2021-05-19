@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 from recipes import urls as recipesurls
-from recipes import views
+from . import views
 
 from users import urls as userurls
 

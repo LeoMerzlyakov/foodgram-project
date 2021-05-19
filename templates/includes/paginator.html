@@ -1,23 +1,23 @@
-        {% if page.has_other_pages %}
-            <nav class="pagination" aria-label="Search results pages">
-                <ul class="pagination__container">
+{% if page.has_other_pages %}
+    <nav class="pagination" aria-label="Search results pages">
+        <ul class="pagination__container">
 
-                    {% if page.has_previous %}
-                            <li class="pagination__item"><a class="pagination__link link" href="?page={{ page.previous_page_number }}&tags={{ tags }}"><span class="icon-left"></span></a></li>
-                    {% endif %}
+            {% if page.has_previous %}
+                    <li class="pagination__item"><a class="pagination__link link" href="?page={{ page.previous_page_number }}&tags={{ tags }}"><span class="icon-left"></span></a></li>
+            {% endif %}
 
-                    {% for i in paginator.page_range %}
-                        {% if page.number == i %}
-                            <li class="pagination__item pagination__item_active"><a class="pagination__link link" href="?page={{ i }}&tags={{ tags }}">{{ i }}</a></li>
-                        {% else %}
-                            <li class="pagination__item"><a class="pagination__link link" href="?page={{ i }}&tags={{ tags }}">{{ i }}</a></li>
-                        {% endif %}
-                    {% endfor %}
-            
-                    {% if page.has_next %}
-                        <li class="pagination__item"><a class="pagination__link link" href="?page={{ page.next_page_number }}&tags={{ tags }}"><span class="icon-right"></span></a></li>
-                    {% endif %}
+            {% for i in paginator.page_range %}
+                {% if page.number == i %}
+                    <li class="pagination__item pagination__item_active"><a class="pagination__link link" href="?page={{ i }}&tags={{ tags }}">{{ i }}</a></li>
+                {% else %}
+                    <li class="pagination__item"><a class="pagination__link link" href="?page={{ i }}&tags={{ tags }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+    
+            {% if page.has_next %}
+                <li class="pagination__item"><a class="pagination__link link" href="?page={{ page.next_page_number }}&tags={{ tags }}"><span class="icon-right"></span></a></li>
+            {% endif %}
 
-                </ul>
-            </nav>
-        {% endif %}
+        </ul>
+    </nav>
+{% endif %}

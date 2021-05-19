@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 
-from recipes.models import Favorite, Follow, Purchase
+from recipes.models import Favorite, Follow, Purchase, Recipe
 
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import api_view
@@ -14,7 +14,7 @@ from .serializers import (
     PurchaseSerializer,
     SubscriptionSerializer,
 )
-from .service import get_ingredients
+from .service import get_ingredients, get_author_instance
 
 
 @api_view(['GET'])
@@ -22,9 +22,8 @@ def ingredients_found(request):
     """
     A function for seasrch the ingredients for drop-down list.
     """
-    if request.GET['query']:
-        find_text = request.GET['query']
-        data = get_ingredients(find_text)
+    if request.query_params.get('query'):
+        data = get_ingredients(request.query_params.get('query'))
         return Response(
             status=status.HTTP_200_OK,
             data=data
@@ -35,13 +34,17 @@ def ingredients_found(request):
         )
 
 
-class FavoriteViewSet(mixins.CreateModelMixin,
-                      mixins.DestroyModelMixin,
-                      viewsets.GenericViewSet):
+class CustomViewSet(mixins.CreateModelMixin,
+                    mixins.DestroyModelMixin,
+                    viewsets.GenericViewSet):
+    permission_classes = [IsAuthenticated, ]
+
+
+
+class FavoriteViewSet(CustomViewSet):
     """
     A ModelViewSet for create or delete favorites records.
     """
-    permission_classes = [IsAuthenticated, ]
     queryset = Favorite.objects.all()
     serializer_class = FavoriteSerializer
 
@@ -50,73 +53,41 @@ class FavoriteViewSet(mixins.CreateModelMixin,
 
     def destroy(self, request, *args, **kwargs):
         instance = get_object_or_404(
-            Favorite, user=request.user, recipe=kwargs['pk']
+            Favorite, user=request.user, recipe=kwargs.get('pk')
         )
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class PurchasesViewSet(mixins.CreateModelMixin,
-                       mixins.DestroyModelMixin,
-                       viewsets.GenericViewSet):
+class PurchasesViewSet(CustomViewSet):
     """
     A ViewSet for create or delete purchases records.
     """
-    permission_classes = [IsAuthenticated, ]
     queryset = Purchase.objects.all()
     serializer_class = PurchaseSerializer
 
-    def create(self, request, *args, **kwargs):
-        # в запросе приходит параметр 'id' вместо 'recipe'.
-        # Добавляю в данные параметр.
-        data = request.data
-        if request.data['id']:
-            data['recipe'] = request.data['id']
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
-
     def perform_create(self, instance):
-        instance.save(user=self.request.user)
+        recipe = get_object_or_404(Recipe, id=self.request.data.get('id'))
+        instance.save(user=self.request.user, recipe=recipe)
 
     def destroy(self, request, *args, **kwargs):
-        # в запросе приходит параметр 'pk' вместо 'recipe'.
-        # Добавляю в данные параметр.
         instance = get_object_or_404(
-            Purchase, user=request.user, recipe=kwargs['pk']
+            Purchase, user=request.user, recipe=kwargs.get('pk')
         )
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class SubscriptionViewSet(mixins.CreateModelMixin,
-                          mixins.DestroyModelMixin,
-                          viewsets.GenericViewSet):
+class SubscriptionViewSet(CustomViewSet):
     """
     A ModelViewSet for create or delete Subscription.
     """
-    permission_classes = [IsAuthenticated, ]
     queryset = Follow.objects.all()
     serializer_class = SubscriptionSerializer
 
-    def create(self, request, *args, **kwargs):
-        # В запросе приходит параметр 'author'. Приходит под именем 'id'.
-        # Параметр может придти как 'pk', так и 'username'
-        if request.data['id']:
-            param = request.data['id']
-            try:
-                param = int(param)
-            except ValueError:
-                param = param
-
-            if type(param) == int:
-                author = get_object_or_404(User, pk=int(param))
-            else:
-                author = get_object_or_404(User, username=param)
+    def create_not_used(self, request, *args, **kwargs):
+        if request.data.get('id'):
+            author = get_author_instance(request.data.get('id'))
             data = {
                 'author': author.pk,
                 'user': request.user.pk,
@@ -135,19 +106,13 @@ class SubscriptionViewSet(mixins.CreateModelMixin,
             data={'success': False}
         )
 
-    def destroy(self, request, *args, **kwargs):
-        # в запросе приходит параметр 'author' приходит под именеи 'pk'.
-        # Параметр может придти как 'pk', так и 'username'
-        if kwargs['pk']:
-            try:
-                param = int(kwargs['pk'])
-            except ValueError:
-                param = kwargs['pk']
+    def perform_create(self, serializer):
+        author = get_author_instance(self.request.data.get('id'))
+        serializer.save(user=self.request.user, author=author)
 
-            if type(param) == int:
-                author = get_object_or_404(User, pk=int(kwargs['pk']))
-            else:
-                author = get_object_or_404(User, username=kwargs['pk'])
+    def destroy(self, request, *args, **kwargs):
+        if kwargs.get('pk'):
+            author = get_author_instance(kwargs.get('pk'))
             user = request.user
             instance = get_object_or_404(Follow, author=author, user=user)
             self.perform_destroy(instance)
