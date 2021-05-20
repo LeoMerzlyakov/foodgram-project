@@ -3,8 +3,10 @@ static/
 media/
 .vscode/
 .dockerignore
-docker-compose.yaml
-dockerfile
+# docker-compose.yaml
+# dockerfile
+# /nginx
+nginx.config
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
