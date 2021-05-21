@@ -13,7 +13,7 @@ services:
       - ./.env
 
   web:
-    image: leomerzlyakov/foodgram_project:v2_postgres
+    image: leomerzlyakov/foodgram_project:latest
     restart: always
     command: gunicorn foodgram_project.wsgi:application --bind 0.0.0.0:8000
     volumes:
