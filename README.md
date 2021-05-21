@@ -10,11 +10,11 @@
 ### Запуск проекта:
 1. Установть на VM Docker, Docker-compose.
 2. Скопировать на VM файлы:
-    * docker-compose.yaml
-    * .env - файл с переменными окружения - настройки проекта и БД.
-    * ./nginx/default.conf
+    - docker-compose.yaml
+    - .env - файл с переменными окружения - настройки проекта и БД.
+    - ./nginx/default.conf
 3. Выполнить команды:
-⋅⋅* для запуск проекта: `docker-compose up`
-⋅⋅* подготовка базы данных : `python manage.py migrate`
-⋅⋅* импорт интредиентов: `python manage.py load_ingredients`
-⋅⋅* создание тэгов (обед, завтрак, ужин): `python manage.py create_tags`
+⋅⋅3. для запуск проекта: `docker-compose up`
+⋅⋅3. подготовка базы данных : `python manage.py migrate`
+⋅⋅3. импорт интредиентов: `python manage.py load_ingredients`
+⋅⋅3. создание тэгов (обед, завтрак, ужин): `python manage.py create_tags`
