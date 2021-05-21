@@ -28,7 +28,6 @@
                             <button class="button button_style_none" name="favorites"><span class="icon-favorite icon-favorite_active"></span></button>
                         {% endif %}
                         <div class="single-card__favorite-tooltip tooltip">Добавить в избранное</div>
-                        
                     </div>
                 </div>
 
@@ -49,6 +48,7 @@
                 </ul>
 
                 <div class="single-card__items single-card__items_column">
+
                     <p class="single-card__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
                     <ul class="single-card__items">
                         <li class="single-card__item"><p class="single-card__text"><span class="icon-user"></span> {{ recipe.author }}</p></li>
@@ -58,23 +58,27 @@
                     </ul>
                 </div>
 
-                <ul class="single-card__items">
-                    {% is_in_purchase request.user.id recipe.id as in_purchase %} 
-                    {% if in_purchase %}
-                        <button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span> Рецепт добавлен</button>
-                    {% else %}
-                        <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
-                    {% endif %}  
-                
-                    <li class="single-card__item">
-                        {% is_subscubed request.user.id recipe.author.id as subs_true %} 
-                        {% if subs_true %}
-                            <button class="button button_style_light-blue-outline button_size_subscribe" name="subscribe">Отписаться от автора</button>
+                {% if request.user.is_authenticated %}
+                    <ul class="single-card__items">
+                        
+                        {% is_in_purchase request.user.id recipe.id as in_purchase %} 
+                        {% if in_purchase %}
+                            <li class="single-card__item"><button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span> Рецепт добавлен</button></li>
                         {% else %}
-                            <button class="button button_style_light-blue-outline button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button>
-                        {% endif %}
-                    </li>
-                </ul>
+                            <li class="single-card__item"><button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button></li>
+                        {% endif %}  
+                    
+                        <li class="single-card__item">
+                            {% is_subscubed request.user.id recipe.author.id as subs_true %} 
+                            {% if subs_true %}
+                                <li class="single-card__item"><button class="button button_style_light-blue-outline button_size_subscribe" name="subscribe">Отписаться от автора</button></li>
+                            {% else %}
+                                <li class="single-card__item"><button class="button button_style_light-blue-outline button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></li>
+                            {% endif %}
+                        </li>
+
+                    </ul>
+                {% endif %}
 
                 <div class="single-card__section">
                     <h3 class="single-card__section-title">Ингридиенты:</h3>

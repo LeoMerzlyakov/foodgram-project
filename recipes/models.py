@@ -16,8 +16,8 @@ class Recipe(models.Model):
         verbose_name='recipe name',
     )
     image = models.ImageField(
-        blank=True,
-        null=True,
+        blank=False,
+        null=False,
         verbose_name='recipe photo',
     )
     description = models.TextField(

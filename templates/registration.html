@@ -26,9 +26,13 @@
                     <div class="form__group">
                         <label for="{{ field.id_for_label }}" class="form__label">{{ field.label }}</label>
                         <div class="form__field-group">
-                            
+                        
                             <input
-                                type="{{field.type}}"
+                                {% if field.html_name == 'password1' or field.html_name == 'password2' %}
+                                    type="password"
+                                {% else %}
+                                    type="text"
+                                {% endif %}
                                 name="{{ field.html_name }}"
                                 id="{{ field.id_for_label }}"
                                 class="form__input"

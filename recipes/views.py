@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.forms.forms import Form
 from django.http import FileResponse
 from django.http.response import (Http404)
 from django.shortcuts import get_object_or_404, redirect, render
@@ -50,7 +51,7 @@ def user_recipes(request, user_id):
     return render(request, 'author_recipe.html', context)
 
 
-@login_required
+@login_required(redirect_field_name='next', login_url='/auth/login/')
 def favorites(request):
     """ Страница для вывода избранных записей текущего пользователя """
     selected_tags = services.make_tag_context(request)
@@ -71,17 +72,18 @@ def favorites(request):
     return render(request, 'favorite.html', context)
 
 
-@login_required
+@login_required(redirect_field_name='next', login_url='/auth/login/')
 def edit_recipes(request, recipe_id):
     """Страница с формой редактирования рецепта"""
     recipe = get_object_or_404(models.Recipe, pk=recipe_id)
     ingredients = models.IngredientsValue.objects.filter(recipe=recipe)
-
     form = forms.RecipeForm(
         request.POST or None ,
         instance=recipe,
         files=request.FILES or None
     )
+    if not services.volidate_form_tags(request.POST):
+        form.errors['tags'] = 'Выбирите один из вариантов!'
     if form.is_valid():
         recipe = services.seve_recipe(request, form, recipe_id)
         return redirect('recipes:recipe', recipe_id=recipe.id)
@@ -98,13 +100,15 @@ def edit_recipes(request, recipe_id):
         return render(request, 'change_recipe.html', context)
 
 
-@login_required
+@login_required(redirect_field_name='next', login_url='/auth/login/')
 def create_recipe(request):
     """Страница с формой создания рецепта"""
     form = forms.RecipeForm(
         request.POST or None,
         files=request.FILES or None
     )
+    if not services.volidate_form_tags(request.POST) and request.method == 'POST':
+        form.errors['tags'] = 'Выбирите один из вариантов!'
     if form.is_valid():
         recipe = services.seve_recipe(request, form)
         return redirect('recipes:recipe', recipe_id=recipe.id)
@@ -112,10 +116,10 @@ def create_recipe(request):
         recipe = {}
         if form.data:
             recipe = {
-                'title': form.data['title'],
-                'image': form.data['image'],
-                'description': form.data['description'],
-                'cooking_time': form.data['cooking_time'],
+                'title': form.data.get('title'),
+                'image': form.data.get('image'),
+                'description': form.data.get('description'),
+                'cooking_time': form.data.get('cooking_time'),
             }
         page = services.get_form_name(form.instance.id)
 
@@ -127,7 +131,7 @@ def create_recipe(request):
         return render(request, 'change_recipe.html', context)
 
 
-@login_required
+@login_required(redirect_field_name='next', login_url='/auth/login/')
 def follows(request):
     """Страница с отображением подписок"""
 
@@ -141,7 +145,7 @@ def follows(request):
     return render(request, 'my_follows.html', context)
 
 
-@login_required
+@login_required(redirect_field_name='next', login_url='/auth/login/')
 def purchases(request):
     """Страница с отображением покупок"""
     recipes = models.Recipe.objects.filter(
@@ -154,7 +158,7 @@ def purchases(request):
     return render(request, 'shop_list.html', context)
 
 
-@login_required
+@login_required(redirect_field_name='next', login_url='/auth/login/')
 def purchases_delete(request, recipe_id):
     """Удалить рецепт из списка покупок"""
     purchase = get_object_or_404(
@@ -173,7 +177,6 @@ def purchases_delete(request, recipe_id):
     return render(request, 'shop_list.html', context)
 
 
-@login_required
 def recipe(request, recipe_id):
     """Страница с отображением конкретного рецепта"""
     recipe = get_object_or_404(models.Recipe, pk=recipe_id)
@@ -185,7 +188,7 @@ def recipe(request, recipe_id):
     return render(request, 'recipe_page.html', context)
 
 
-@login_required
+@login_required(redirect_field_name='next', login_url='/auth/login/')
 def delete_recipe(request, recipe_id):
     """Страница с отображением конкретного рецепта"""
     recipe = get_object_or_404(models.Recipe, pk=recipe_id)

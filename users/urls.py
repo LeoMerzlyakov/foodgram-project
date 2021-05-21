@@ -4,6 +4,8 @@ from django.contrib.auth.views import (
     PasswordChangeDoneView,
     PasswordChangeView,
     PasswordResetConfirmView,
+    PasswordResetDoneView,
+    PasswordResetCompleteView,
     PasswordResetView)
 from django.urls import path, reverse_lazy
 
@@ -31,12 +33,23 @@ urlpatterns = [
     ), name='password_change_done'),
 
     path('reset_pass/', PasswordResetView.as_view(
+        success_url=reverse_lazy('users:password_reset_done'),
         template_name='reset_password.html',
-        success_url='recipes:recipes',
     ), name='reset_password'),
 
+    path('reset_pass_sent/', PasswordResetDoneView.as_view(
+        template_name='reset_password_done.html'
+    ), name='password_reset_done'),
+
     path('reset/<str:uidb64>/<str:token>/', PasswordResetConfirmView.as_view(
+        success_url=reverse_lazy('users:password_reset_complete')
     ), name='password_reset_confirm'),
+
+    path(
+        'reset_pass_complete/',
+        PasswordResetCompleteView.as_view(),
+        name='password_reset_complete'
+    ),
 
     path('register/', views.register_user, name='register'),
 ]

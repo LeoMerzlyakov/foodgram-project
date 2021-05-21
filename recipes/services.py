@@ -157,3 +157,14 @@ def get_paginator(request, obj_list):
 
 def get_form_name(instance_id):
     return 'edit_recipe' if instance_id else 'new_recipe'
+
+
+def volidate_form_tags(data):
+    tags = []
+    if 'breakfast' in data:
+        return True
+    if 'lunch' in data:
+        return True
+    if 'dinner' in data:
+        return True
+    return False
