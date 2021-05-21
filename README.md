@@ -1,9 +1,20 @@
-# foodgram-project
-foodgram-project
+# Foodgram Project
 
-http://130.193.44.15/
+### Продуктовый помощник
+Онлайн-сервис, где можно опубликовать рецепты, подписываться на публикации других пользователей, добавлять понравившиеся рецепты в список «Избранное».
+Можно скачивать сводный список продуктов, необходимых для приготовления одного или нескольких выбранных блюд.
+    
+### Сайт:
+[Продуктовый помощник](http://130.193.44.15/)
 
-For server:
-1. Comand: 'python manage.py migrate'
-2. Load Ingredients comand: 'python manage.py load_ingredients'
-3. Create Tags (Breakfast, lunch, dinner) command: 'python manage.py create_tags'
+### Запуск проекта:
+1. Установть на VM Docker, Docker-compose.
+2. Скопировать на VM файлы:
+    * docker-compose.yaml
+    * .env - файл с переменными окружения - настройки проекта и БД.
+    * ./nginx/default.conf
+3. Выполнить команды:
+⋅⋅* для запуск проекта: `docker-compose up`
+⋅⋅* подготовка базы данных : `python manage.py migrate`
+⋅⋅* импорт интредиентов: `python manage.py load_ingredients`
+⋅⋅* создание тэгов (обед, завтрак, ужин): `python manage.py create_tags`
