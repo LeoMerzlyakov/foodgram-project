@@ -40,7 +40,6 @@ class CustomViewSet(mixins.CreateModelMixin,
     permission_classes = [IsAuthenticated, ]
 
 
-
 class FavoriteViewSet(CustomViewSet):
     """
     A ModelViewSet for create or delete favorites records.

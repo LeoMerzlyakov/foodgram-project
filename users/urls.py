@@ -35,6 +35,8 @@ urlpatterns = [
     path('reset_pass/', PasswordResetView.as_view(
         success_url=reverse_lazy('users:password_reset_done'),
         template_name='reset_password.html',
+        subject_template_name = 'password_reset_subject.txt',
+        email_template_name = 'password_reset_email.html',
     ), name='reset_password'),
 
     path('reset_pass_sent/', PasswordResetDoneView.as_view(
@@ -42,12 +44,14 @@ urlpatterns = [
     ), name='password_reset_done'),
 
     path('reset/<str:uidb64>/<str:token>/', PasswordResetConfirmView.as_view(
-        success_url=reverse_lazy('users:password_reset_complete')
+        success_url=reverse_lazy('users:password_reset_complete',
+        # template_name = 'password_reset_confirm_custom.html'
+    )
     ), name='password_reset_confirm'),
 
-    path(
-        'reset_pass_complete/',
-        PasswordResetCompleteView.as_view(),
+    path('reset_pass_complete/', PasswordResetCompleteView.as_view(
+        template_name = 'password_reset_complete.html'
+    ),
         name='password_reset_complete'
     ),
 

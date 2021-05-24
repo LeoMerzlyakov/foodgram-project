@@ -15,9 +15,8 @@
         {% csrf_token %}
         {% include "includes/main_header.html" %}
         {% if request.user.is_authenticated %}
-            {% if request.user.id != page.object_list.first.author.id %} 
+            {% if request.user != author %} 
                 {% is_subscubed request.user.id page.object_list.first.author.id as subs_true %} 
-
                 <div class="author-subscribe" data-author="{{ page.object_list.first.author.id }}">
                     {% if subs_true %}
                         <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe">Отписаться от автора</button></p>
@@ -28,6 +27,7 @@
             {% else %}
                 <h1>Мои рецепты</h1>
             {% endif %}
+
         {% endif %}
         
         {% include "includes/card_list.html" %}

@@ -21,6 +21,17 @@ def get_ingredients(request):
     return ingredients
 
 
+def ingr_validate(ingredients):
+    for ingredient in ingredients:
+        value = ingredients.get(ingredient)
+        if not Ingredient.objects.filter(ingredient=ingredient).exists():
+            return False, f'Ингредиента "{ingredient}" не существует'
+        if int(value) < 1:
+            return False, f'Количество ингредиента "{ingredient}" \
+                должно быть не отрицательным (введено {value})'
+    return True, 'OK'
+
+
 def clean_ingredients(recipe_id):
     IngredientsValue.objects.filter(recipe=recipe_id).delete()
 
@@ -162,9 +173,9 @@ def get_form_name(instance_id):
 def volidate_form_tags(data):
     tags = []
     if 'breakfast' in data:
-        return True
+        tags.append(Tag.BREAKFAST)
     if 'lunch' in data:
-        return True
+        tags.append(Tag.LUNCH)
     if 'dinner' in data:
-        return True
-    return False
+        tags.append(Tag.DINNER)
+    return (False if len(tags) < 1 else True) , tags

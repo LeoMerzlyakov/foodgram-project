@@ -1,7 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.forms.forms import Form
 from django.http import FileResponse
 from django.http.response import (Http404)
 from django.shortcuts import get_object_or_404, redirect, render
@@ -33,7 +31,9 @@ def recipes(request):
 
 
 def user_recipes(request, user_id):
+    """ Страница вывода записей выбранного автора """
     selected_tags = services.make_tag_context(request)
+    author = get_object_or_404(User, pk=user_id)
     recipes = models.Recipe.objects.filter(
         author=user_id,
         tags__name__in=selected_tags
@@ -46,7 +46,8 @@ def user_recipes(request, user_id):
         'page': page,
         'paginator': paginator,
         'tags': selected_tags,
-        'selected_page': 'author'
+        'selected_page': 'author',
+        'author': author,
     }
     return render(request, 'author_recipe.html', context)
 
@@ -82,14 +83,24 @@ def edit_recipes(request, recipe_id):
         instance=recipe,
         files=request.FILES or None
     )
-    if not services.volidate_form_tags(request.POST):
+
+    tag_is_valid, tags = services.volidate_form_tags(request.POST)
+    if not tag_is_valid and request.method == 'POST':
         form.errors['tags'] = 'Выбирите один из вариантов!'
+
+    # проверим ингридиенты:
+    ingrs_is_valid, error_msg = services.ingr_validate(
+        services.get_ingredients(request)
+    )
+    if not ingrs_is_valid:
+        form.errors['ingr_error'] = error_msg
+
     if form.is_valid():
         recipe = services.seve_recipe(request, form, recipe_id)
         return redirect('recipes:recipe', recipe_id=recipe.id)
     else:
         page = services.get_form_name(form.instance.id)
-        tags = recipe.tags.values_list('name', flat=True)
+        # tags = recipe.tags.values_list('name', flat=True)
         context = {
             'form': form,
             'recipe': recipe,
@@ -107,8 +118,18 @@ def create_recipe(request):
         request.POST or None,
         files=request.FILES or None
     )
-    if not services.volidate_form_tags(request.POST) and request.method == 'POST':
-        form.errors['tags'] = 'Выбирите один из вариантов!'
+
+    tag_is_valid, tags = services.volidate_form_tags(request.POST)
+    if not tag_is_valid and request.method == 'POST':
+        form.errors['tags_error'] = 'Выбирите один из вариантов!'
+    
+    # проверим ингридиенты:
+    ingrs_is_valid, error_msg = services.ingr_validate(
+        services.get_ingredients(request)
+    )
+    if not ingrs_is_valid:
+        form.errors['ingr_error'] = error_msg
+    
     if form.is_valid():
         recipe = services.seve_recipe(request, form)
         return redirect('recipes:recipe', recipe_id=recipe.id)
@@ -120,6 +141,7 @@ def create_recipe(request):
                 'image': form.data.get('image'),
                 'description': form.data.get('description'),
                 'cooking_time': form.data.get('cooking_time'),
+                'tags': tags,
             }
         page = services.get_form_name(form.instance.id)
 

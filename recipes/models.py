@@ -52,7 +52,7 @@ class Recipe(models.Model):
 class IngredientsValue(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=CASCADE)
     ingredient = models.ForeignKey('Ingredient', on_delete=CASCADE)
-    value = models.FloatField()
+    value = models.PositiveIntegerField()
 
     def __str__(self):
         return f'{self.recipe} - {self.ingredient}'

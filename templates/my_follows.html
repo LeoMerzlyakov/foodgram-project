@@ -36,6 +36,7 @@
                                     </div>
                                 </li>
                             {% endfor %}
+
                             <li class="card-user__item">
                                 <a href="{% url 'recipes:recipes_by_author' user_id=follow.author.id %}" class="card-user__link link">
                                 {% recipes_left follow.author.id as count_left %}
@@ -47,12 +48,14 @@
                                 
                                 </a>
                             </li>
+
                         </ul>
                     </div>
+                    
                     <div class="card-user__footer">
                         <button class="button button_style_light-blue button_size_auto" name="subscribe">Отписаться</button>
                     </div>
-                </div>  
+                </div>
             {% endfor %}
         </div>
         {% include "includes/paginator.html" %}
