@@ -26,6 +26,11 @@ def ingr_validate(ingredients):
         value = ingredients.get(ingredient)
         if not Ingredient.objects.filter(ingredient=ingredient).exists():
             return False, f'Ингредиента "{ingredient}" не существует'
+        try:
+            int(value)
+        except TypeError:
+            return False, f'Количество ингредиента "{ingredient}" \
+                должно быть целым числом (введено {value})'
         if int(value) < 1:
             return False, f'Количество ингредиента "{ingredient}" \
                 должно быть не отрицательным (введено {value})'

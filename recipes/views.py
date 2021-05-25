@@ -86,7 +86,7 @@ def edit_recipes(request, recipe_id):
 
     tag_is_valid, tags = services.volidate_form_tags(request.POST)
     if not tag_is_valid and request.method == 'POST':
-        form.errors['tags'] = 'Выбирите один из вариантов!'
+        form.errors['tags_error'] = 'Выбирите один из вариантов!'
 
     # проверим ингридиенты:
     ingrs_is_valid, error_msg = services.ingr_validate(
@@ -100,7 +100,6 @@ def edit_recipes(request, recipe_id):
         return redirect('recipes:recipe', recipe_id=recipe.id)
     else:
         page = services.get_form_name(form.instance.id)
-        # tags = recipe.tags.values_list('name', flat=True)
         context = {
             'form': form,
             'recipe': recipe,
@@ -148,7 +147,8 @@ def create_recipe(request):
         context = {
             'form': form,
             'recipe': recipe,
-            'selected_page': page
+            'selected_page': page,
+            'tags': tags,
         }
         return render(request, 'change_recipe.html', context)
 
